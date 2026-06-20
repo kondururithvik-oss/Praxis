@@ -1,0 +1,3814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P.N. Junction Diode Characteristics - Virtual BEE Lab</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="An interactive, high-fidelity virtual electrical engineering lab simulation for studying P.N. Junction Diode V-I Characteristics of Silicon (IN4007) and Germanium (OA79) diodes using a virtual patch-panel wiring trainer board.">
+  <meta name="keywords" content="PN Junction, Diode Characteristics, Virtual Lab, BEE Lab, Electrical Engineering, IN4007, OA79, Shockley Diode Equation, Analog Wiring">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & CSS VARIABLES - TEXLA TSI-1145A STYLE
+       ========================================================================== */
+    :root {
+      --bg-main: #060814;         /* Charcoal workbench benchtop */
+      --bg-card: #0b0f19;         /* Inset instrument cards */
+      --bg-card-header: #070a12;  /* Inset card headers */
+      --border-color: #171c26;    /* Panel borders */
+      --text-main: #f4f4f7;       /* Main text */
+      --text-muted: #8e8e9f;      /* Secondary text */
+      
+      /* Accent Colors */
+      --accent-primary: #00f0ff;   /* Blue */
+      --accent-fwd: #10b981;       /* Emerald */
+      --accent-rev: #06b6d4;       /* Cyan */
+      --accent-danger: #f87171;    /* Coral Red */
+      --bezel-color: #cbd5e1;      /* TEXLA cream off-white */
+      --pcb-green: #0a542b;
+      
+      /* Fonts */
+      --font-main: 'Inter', sans-serif;
+      --font-led: 'Orbitron', monospace;
+    }
+
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0),
+        radial-gradient(rgba(255, 255, 255, 0.01) 2px, transparent 0);
+      background-size: 24px 24px, 48px 48px;
+      color: var(--text-main);
+      font-family: var(--font-main);
+      overflow-x: hidden;
+      line-height: 1.5;
+      padding: 1.5rem 0;
+    }
+
+    /* Layout Grid */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 92vh;
+      padding: 1.75rem;
+      gap: 1.25rem;
+      max-width: 1680px;
+      margin: 0 auto;
+      background: #060814; /* Cabinet interior shadow */
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      box-shadow: 
+        inset 0 4px 10px rgba(255, 255, 255, 0.8),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.35),
+        0 20px 50px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+
+    /* Header Styling */
+    header {
+      background: linear-gradient(135deg, var(--bg-card) 0%, #15151f 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-title h1 {
+      font-family: var(--font-led);
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      background: linear-gradient(to right, #ffffff, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-title p {
+      display: none;
+    }
+
+    .header-badges {
+      display: none;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3rem 0.85rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-family: var(--font-led);
+    }
+
+    .badge.active-si {
+      border-color: rgba(248, 113, 113, 0.4);
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.05);
+      text-shadow: 0 0 5px rgba(248, 113, 113, 0.3);
+    }
+
+    .badge.active-ge {
+      border-color: rgba(6, 182, 212, 0.4);
+      color: #22d3ee;
+      background: rgba(6, 182, 212, 0.05);
+      text-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+    }
+
+    .badge.active-mode {
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.05);
+      text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+    }
+
+    .inst-name {
+      color: var(--accent-primary);
+      border-color: rgba(0, 240, 255, 0.4);
+      background: rgba(0, 240, 255, 0.05);
+      text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+    }
+
+    /* Tab Bar Design */
+    .tab-bar {
+      display: flex;
+      gap: 0.25rem;
+      border-bottom: 2px solid var(--border-color);
+      margin-top: 0.25rem;
+      background: #070a12;
+      padding: 0;
+      border-radius: 6px 6px 0 0;
+      overflow: hidden;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-muted);
+      padding: 0.85rem 1.75rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    .tab-btn.active-tab {
+      background: #0b0f19;
+      color: var(--accent-primary);
+      border-bottom: 3px solid var(--accent-primary);
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.65);
+    }
+
+    /* Tab Switch Visibility */
+    .tab-content {
+      display: none;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    .tab-content.active-content {
+      display: grid;
+    }
+
+    /* Main Content Layout wrappers */
+    .main-grid {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .trainer-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.5fr) 360px;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .trainer-grid .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .trainer-grid > .pcb-container {
+      grid-column: 1;
+    }
+
+    .trainer-grid > .card {
+      grid-column: 2;
+    }
+
+    @media (max-width: 900px) {
+      .trainer-grid {
+        grid-template-columns: 1fr;
+      }
+      .trainer-grid > .pcb-container {
+        grid-column: auto;
+      }
+      .trainer-grid > .card {
+        grid-column: auto;
+      }
+    }
+
+    .analysis-grid {
+      grid-template-columns: 1fr 500px;
+      gap: 1.25rem;
+      align-items: stretch;
+      min-height: 580px;
+    }
+
+    .standard-text-layout {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 1200px) {
+      .analysis-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Panels & Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-header {
+      background: var(--bg-card-header);
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.75px;
+      text-transform: uppercase;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title svg {
+      color: var(--accent-primary);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Left Column: Control Panel */
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .control-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .control-val-display {
+      font-family: var(--font-led);
+      color: var(--accent-primary);
+      font-weight: bold;
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+    }
+
+    /* Power Switch Styling */
+    .power-switch-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
+      padding: 0.85rem 1.25rem;
+      border-radius: 6px;
+    }
+
+    .power-switch-label {
+      font-weight: 800;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 54px;
+      height: 28px;
+    }
+
+    .switch-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider-toggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #21212a;
+      transition: .25s;
+      border-radius: 14px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .slider-toggle:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background: linear-gradient(135deg, #a1a1aa 0%, #52525b 100%);
+      transition: .25s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      border: 0.5px solid #222;
+    }
+
+    input:checked + .slider-toggle {
+      background-color: rgba(16, 185, 129, 0.15);
+      border-color: var(--accent-fwd);
+    }
+
+    input:checked + .slider-toggle:before {
+      transform: translateX(26px);
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+      box-shadow: 0 0 10px var(--accent-fwd);
+    }
+
+    /* Color Palette Picker */
+    .color-picker {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: space-between;
+      background: #0f0f15;
+      padding: 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .palette-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+      transition: transform 0.15s ease, border-color 0.15s;
+    }
+
+    .palette-circle:hover {
+      transform: scale(1.15);
+    }
+
+    .palette-circle.active-color {
+      border-color: #ffffff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Sliders */
+    .slider-input-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .voltage-slider {
+      flex-grow: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: #111116;
+      border: 1px solid var(--border-color);
+      outline: none;
+      cursor: pointer;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.7);
+    }
+
+    .voltage-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00f0ff 0%, #0e7490 100%);
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5), 0 0 10px rgba(8, 145, 178, 0.4);
+      border: 1px solid #111;
+      transition: background 0.15s ease, transform 0.15s;
+    }
+
+    .voltage-slider::-webkit-slider-thumb:hover {
+      background: linear-gradient(135deg, #67e8f9 0%, #06b6d4 100%);
+      transform: scale(1.1);
+    }
+
+    .num-input {
+      width: 76px;
+      background: #0f0f15;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      font-family: var(--font-led);
+      text-align: right;
+      font-size: 0.88rem;
+      outline: none;
+      box-shadow: inset 0 1.5px 3px rgba(0,0,0,0.5);
+    }
+
+    .num-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    /* Connection Status Sidebar Panel */
+    .status-panel {
+      background: rgba(0,0,0,0.15);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .status-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .checklist-item {
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .chk-icon {
+      font-weight: bold;
+      width: 14px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .chk-icon.done { color: var(--accent-fwd); text-shadow: 0 0 4px rgba(16, 185, 129, 0.4); }
+    .chk-icon.fail { color: var(--accent-danger); text-shadow: 0 0 4px rgba(248, 113, 113, 0.4); }
+
+    .chk-text {
+      color: var(--text-muted);
+    }
+    .chk-text.active {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Action Buttons */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn {
+      background: linear-gradient(180deg, #2e2e3c 0%, #1f1f2a 100%);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.7rem 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, #3d3d52 0%, #252535 100%);
+      border-color: #4c4c66;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #0891b2 0%, #0e7490 100%);
+      border: 1px solid #06b6d4;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(180deg, #67e8f9 0%, #06b6d4 100%);
+      border-color: #0891b2;
+      box-shadow: 0 0 12px rgba(8, 145, 178, 0.5);
+    }
+
+    .btn-success {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.1) 100%);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      border-color: #10b981;
+      color: #0d1e15;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(180deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.08) 100%);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+      border-color: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Secondary Nav Controls */
+    .secondary-controls {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .nav-btn {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.68rem;
+      background: #070a12;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      color: var(--text-main);
+      background: #252535;
+      border-color: #4b5563;
+    }
+
+    /* Center Column: PCB Board Cabinet */
+    .pcb-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      flex-grow: 1;
+    }
+
+    .pcb-board {
+      flex-grow: 1;
+      background: radial-gradient(circle at center, #0f763e 0%, #073b1e 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px 0 0 0;
+      border: 10px solid #073b1e; /* Sleek dark green mount frame */
+      outline: 2px solid #1e293b;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8), 0 4px 10px rgba(0,0,0,0.5);
+      border-radius: 8px;
+      min-height: 600px;
+    }
+
+    .circuit-svg {
+      width: 100%;
+      height: 100%;
+      max-height: 560px;
+      margin-top: 0;
+    }
+
+    /* Silkscreen trace details */
+    .pcb-trace {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2.2px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.75;
+    }
+
+    .pcb-guide {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 1.5px;
+      stroke-dasharray: 4 5;
+      opacity: 0.25;
+    }
+
+    /* Dynamic socket styles via CSS override of SVG element attributes */
+    .terminal-socket {
+      cursor: pointer;
+    }
+
+    .terminal-socket circle {
+      transition: r 0.1s ease, stroke-width 0.1s;
+    }
+
+    /* Red sockets */
+    #socket-supply_pos_1 circle:nth-child(2),
+    #socket-supply_pos_2 circle:nth-child(2),
+    #socket-rs_left circle:nth-child(2),
+    #socket-rs_right circle:nth-child(2),
+    #socket-am_sym_pos circle:nth-child(2),
+    #socket-vm_sym_pos circle:nth-child(2),
+    #socket-dpm_am_pos circle:nth-child(2),
+    #socket-dpm_vm_pos circle:nth-child(2) {
+      fill: url(#banana-red) !important;
+    }
+
+    /* Black sockets */
+    #socket-supply_neg_1 circle:nth-child(2),
+    #socket-supply_neg_2 circle:nth-child(2),
+    #socket-am_sym_neg circle:nth-child(2),
+    #socket-vm_sym_neg circle:nth-child(2),
+    #socket-gnd_1 circle:nth-child(2),
+    #socket-gnd_2 circle:nth-child(2),
+    #socket-dpm_am_neg circle:nth-child(2),
+    #socket-dpm_vm_neg circle:nth-child(2) {
+      fill: url(#banana-black) !important;
+    }
+
+    /* Yellow sockets */
+    #socket-diodes_l circle:nth-child(2),
+    #socket-diodes_r circle:nth-child(2),
+    #socket-si_anode circle:nth-child(2),
+    #socket-si_cathode circle:nth-child(2),
+    #socket-ge_anode circle:nth-child(2),
+    #socket-ge_cathode circle:nth-child(2) {
+      fill: url(#banana-yellow) !important;
+    }
+
+    /* Socket Outer Bezel */
+    .terminal-socket circle:nth-child(1) {
+      stroke: url(#chrome-metal) !important;
+      stroke-width: 2.6px !important;
+      r: 9.5px !important;
+    }
+
+    /* Socket Center Hole */
+    .terminal-socket circle:nth-child(3) {
+      fill: #000000 !important;
+      r: 3.8px !important;
+    }
+
+    .terminal-socket:hover circle:nth-child(1) {
+      stroke: #ffffff !important;
+      stroke-width: 2.5px !important;
+    }
+
+    .terminal-selected circle:nth-child(1) {
+      stroke: var(--accent-primary) !important;
+      stroke-width: 3.5px !important;
+      filter: drop-shadow(0 0 6px var(--accent-primary)) !important;
+      animation: socket-pulse 1.2s infinite ease-in-out;
+    }
+
+    @keyframes socket-pulse {
+      0%, 100% { stroke-width: 3.5px; }
+      50% { stroke-width: 1.5px; }
+    }
+
+    /* Physical wires drawn by user */
+    .patch-wire {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      cursor: pointer;
+      transition: stroke-width 0.1s ease, filter 0.1s;
+    }
+
+    .patch-wire:hover {
+      stroke-width: 8.5px !important;
+      filter: drop-shadow(0 0 6px #ffffff) !important;
+    }
+
+    @keyframes wire-entrance {
+      from {
+        opacity: 0;
+        stroke-width: 1px;
+      }
+      to {
+        opacity: 1;
+        stroke-width: 5.5px;
+      }
+    }
+
+    .patch-wire.entrance {
+      animation: wire-entrance 0.25s ease-out forwards;
+    }
+
+    /* Current Flow Particles (along wires and traces) */
+    .current-particle {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 6 30;
+      stroke-dashoffset: 0;
+      display: none;
+    }
+
+    .power-on .current-particle {
+      display: block;
+      animation: flow-current 2s linear infinite;
+    }
+
+    .power-on .current-particle.fwd-flow {
+      stroke: #f97316;
+      stroke-width: 4.5;
+    }
+
+    .power-on .current-particle.rev-flow {
+      stroke: #06b6d4;
+      stroke-width: 2.5;
+      animation-duration: 8s;
+    }
+
+    @keyframes flow-current {
+      to {
+        stroke-dashoffset: -100;
+      }
+    }
+
+    /* DPM Digital readings styling overrides inside SVG foreignObject */
+    .dpm-display-wrapper {
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.95);
+      border: 1.5px solid #222;
+      overflow: hidden;
+    }
+
+    .dpm-bg-digits {
+      font-family: var(--font-led);
+      font-size: 18px;
+      font-weight: 500;
+      color: #3a1010;
+      letter-spacing: 1px;
+      opacity: 0.75;
+    }
+
+    .dpm-fg-digits {
+      font-family: var(--font-led);
+      font-size: 28px;
+      font-weight: 900;
+      color: #ff3b30;
+      letter-spacing: 1.5px;
+      text-shadow: 
+        0 0 10px rgba(255, 59, 48, 0.95),
+        0 0 20px rgba(255, 26, 26, 0.75);
+      transition: opacity 0.15s ease;
+      opacity: 0.05;
+    }
+
+    .power-on .dpm-fg-digits {
+      opacity: 1;
+    }
+
+    .dpm-fg-digits.overflow-blink {
+      animation: blink-overflow 0.5s step-end infinite;
+    }
+
+    @keyframes blink-overflow {
+      50% { opacity: 0; }
+    }
+
+    .dpm-unit {
+      font-family: var(--font-led);
+      font-size: 11px;
+      font-weight: 900;
+      color: #3f3f46;
+      transition: color 0.15s;
+    }
+
+    .power-on .dpm-unit {
+      color: #ff3b30;
+      text-shadow: 0 0 6px rgba(255, 59, 48, 0.5);
+    }
+
+    /* Switch and Knob Hover States */
+    #svg-switch {
+      cursor: pointer;
+      transition: filter 0.15s ease;
+    }
+    #svg-switch:hover {
+      filter: brightness(1.25) drop-shadow(0 0 6px rgba(0, 240, 255, 0.5));
+    }
+
+    #svg-dc-supply {
+      cursor: not-allowed;
+    }
+    .power-on #svg-dc-supply {
+      cursor: grab;
+      transition: filter 0.15s ease;
+    }
+    .power-on #svg-dc-supply:active {
+      cursor: grabbing;
+    }
+    .power-on #svg-dc-supply:hover {
+      filter: brightness(1.1) drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
+    }
+
+    /* Active indicator for range selection switches */
+    .active-fwd {
+      fill: #34d399 !important;
+      color: #34d399 !important; /* Green glow for active range */
+      font-weight: 900 !important;
+      text-shadow: 0 0 6px rgba(52, 211, 153, 0.6) !important;
+    }
+
+    /* Graph Card */
+    .graph-card {
+      flex-grow: 1;
+      min-height: 480px; /* Taller graph in the dedicated tab */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .graph-container {
+      position: relative;
+      flex-grow: 1;
+      width: 100%;
+      height: 100%;
+      min-height: 380px;
+      background: #04050a;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+    }
+
+    #vi-graph {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .graph-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem;
+      background: #080a12;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .graph-legend {
+      display: flex;
+      gap: 0.85rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .legend-color {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .legend-si { background: #f87171; box-shadow: 0 0 4px #f87171; }
+    .legend-ge { background: #22d3ee; box-shadow: 0 0 4px #22d3ee; }
+    .legend-cur { background: #34d399; box-shadow: 0 0 4px #34d399; }
+
+    /* Bottom: Observation Table */
+    .table-section {
+      height: 100%;
+    }
+
+    .table-container {
+      max-height: 400px; /* Taller table matches the graph height */
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: #05070c;
+      flex-grow: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-card-header);
+      padding: 0.75rem 1rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.75px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    td {
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+      color: var(--text-main);
+      font-family: var(--font-led);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .empty-table-msg {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.85rem;
+      font-family: var(--font-main);
+    }
+
+    .table-summary-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: var(--bg-card-header);
+      padding: 0.85rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.8rem;
+    }
+
+    .summary-metric {
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .summary-metric span {
+      color: var(--accent-fwd);
+      font-family: var(--font-led);
+      font-weight: 800;
+      font-size: 0.88rem;
+      margin-left: 0.3rem;
+    }
+
+    /* Modal Drawers (Theory & Procedure) */
+    .drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -450px;
+      width: 450px;
+      height: 100%;
+      background: #060814;
+      border-left: 1px solid var(--border-color);
+      z-index: 101;
+      box-shadow: -8px 0 30px rgba(0, 0, 0, 0.6);
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 500px) {
+      .drawer {
+        width: 100%;
+        right: -100%;
+      }
+    }
+
+    .drawer.active {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 1.25rem;
+      background: var(--bg-card-header);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .drawer-header h2 {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-family: var(--font-led);
+      color: var(--accent-primary);
+    }
+
+    .drawer-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.75rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .drawer-close:hover {
+      color: var(--text-main);
+    }
+
+    .drawer-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex-grow: 1;
+      font-size: 0.88rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .drawer-body h3 {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--text-main);
+      border-left: 3px solid var(--accent-primary);
+      padding-left: 0.6rem;
+      margin-top: 0.5rem;
+    }
+
+    .drawer-body p, .drawer-body li {
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .drawer-body ul {
+      padding-left: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .math-block {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      padding: 0.85rem;
+      border-radius: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: #67e8f9;
+      overflow-x: auto;
+      text-align: center;
+    }
+
+    /* Guided steps */
+    .step-item {
+      padding: 0.85rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: rgba(255,255,255,0.01);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .step-item.active-step {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: rgba(0, 240, 255, 0.25);
+    }
+
+    .step-item.active-step h4 {
+      color: var(--accent-primary);
+    }
+
+    .step-item h4 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+      color: var(--text-main);
+    }
+
+    .step-item p {
+      font-size: 0.72rem;
+    }
+
+    /* Highlight ring */
+    .svg-highlight-socket {
+      stroke: var(--accent-primary) !important;
+      stroke-width: 4 !important;
+      filter: drop-shadow(0 0 6px var(--accent-primary)) !important;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.25rem 0;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      margin-top: 0.5rem;
+    }
+
+    /* Toast alerts */
+    .toast-container {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #070a12;
+      border: 1px solid #f87171;
+      border-left: 4px solid #f87171;
+      color: #f87171;
+      padding: 0.8rem 1.4rem;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      animation: slide-in 0.3s ease forwards;
+    }
+
+    .toast.toast-warning {
+      border-color: #fbbf24;
+      border-left-color: #fbbf24;
+      color: #fcd34d;
+    }
+
+    .toast.toast-info {
+      border-color: #00f0ff;
+      border-left-color: #00f0ff;
+      color: #67e8f9;
+    }
+
+    @keyframes slide-in {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast-container" id="toast-box"></div>
+
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header>
+      <div class="header-title">
+        <h1>P.N. JUNCTION DIODE CHARACTERISTICS</h1>
+        <p>Basic Electrical Engineering Interactive Simulation Virtual Lab</p>
+      </div>
+      <div class="header-badges">
+        <span class="badge inst-name">[Your Institution Name]</span>
+        <span class="badge" id="badge-diode">UNWIRED</span>
+        <span class="badge" id="badge-bias">UNWIRED</span>
+        <span class="badge" id="badge-solver">NR-Solver: Ready</span>
+      </div>
+    </header>
+
+        <!-- TAB NAVIGATION BAR -->
+    <div class="tab-bar">
+      <button class="tab-btn active-tab" onclick="switchMainTab('aim')">Aim</button>
+      <button class="tab-btn" onclick="switchMainTab('apparatus')">Apparatus</button>
+      <button class="tab-btn" onclick="switchMainTab('formulas')">Theory &amp; Formulas</button>
+      <button class="tab-btn" onclick="switchMainTab('procedure')">Procedure</button>
+      <button class="tab-btn" onclick="switchMainTab('circuit')">Circuit Diagram</button>
+      <button class="tab-btn" onclick="switchMainTab('simulation')">Simulation</button>
+      <button class="tab-btn" onclick="switchMainTab('observation')">Observation</button>
+      <button class="tab-btn" onclick="switchMainTab('result')">Result</button>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="main-grid">
+      
+      <!-- TAB: AIM -->
+      <div id="tab-aim" class="tab-content active-content standard-text-layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔬 Objective / Aim</div>
+          </div>
+          <div class="card-body">
+            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted);">
+              To study the Volt-Ampere (V-I) characteristics of a P-N Junction Diode (Silicon IN4007 and Germanium OA79) under forward and reverse bias conditions, and to determine their cut-in (knee) voltages.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: APPARATUS -->
+      <div id="tab-apparatus" class="tab-content standard-text-layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🛠️ Apparatus Required</div>
+          </div>
+          <div class="card-body">
+            <ul style="padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; color: var(--text-muted); line-height: 1.6;">
+              <li><strong>TEXLA TSI-1145A Diode Characteristics Trainer Kit</strong>: Integrating the variable DC supply, diodes, and digital display meters on a tactile green PCB panel.</li>
+              <li><strong>Silicon Diode (IN4007)</strong>: For forward and reverse characteristics.</li>
+              <li><strong>Germanium Diode (OA79)</strong>: For low barrier voltage characteristics.</li>
+              <li><strong>Series Resistor (R<sub>S</sub> = 1 K&Omega;)</strong>: Fixed protective resistor.</li>
+              <li><strong>Digital Panel Meters</strong>: For live current and voltage readings.</li>
+              <li><strong>Patch Wires / Connecting Cords</strong>: For forming loop connections.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: FORMULAS -->
+      <div id="tab-formulas" class="tab-content standard-text-layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📚 PN Junction Theory &amp; Formulas</div>
+          </div>
+          <div class="card-body" style="color: var(--text-muted); display: flex; flex-direction: column; gap: 1rem; line-height: 1.6;">
+            <p>
+              A P-N junction is formed by combining p-type and n-type semiconductor regions. 
+              The application of forward bias voltage lowers the potential barrier across the depletion layer, prompting majority carriers to diffuse and produce an exponential rise in current.
+            </p>
+            <p>
+              In reverse bias, the depletion layer widens, blocking major carrier movement and leaving only a negligible reverse saturation current (leakage current) to flow.
+            </p>
+            
+            <h3 style="color: var(--text-main); font-size: 0.95rem; margin-top: 0.5rem; border-left: 3px solid var(--accent-primary); padding-left: 0.5rem;">Shockley Diode Equation</h3>
+            <div class="math-block" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); padding: 1rem; border-radius: 6px; font-family: 'Fira Code', monospace; color: var(--accent-primary); text-align: center;">
+              I<sub>d</sub> = I<sub>s</sub> &times; [ e<sup>V<sub>d</sub> / (n &times; V<sub>t</sub>)</sup> - 1 ]
+            </div>
+            <p>Where:</p>
+            <ul style="padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+              <li><strong>I<sub>d</sub></strong>: Diode current.</li>
+              <li><strong>I<sub>s</sub></strong>: Reverse saturation current (Silicon &approx; 10<sup>-12</sup> A, Germanium &approx; 10<sup>-6</sup> A).</li>
+              <li><strong>V<sub>d</sub></strong>: Diode voltage.</li>
+              <li><strong>n</strong>: Ideality factor (1.0 for Silicon, 1.2 for Germanium).</li>
+              <li><strong>V<sub>t</sub></strong>: Thermal voltage (V<sub>t</sub> &approx; 25.85 mV at 25&deg;C room temperature).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: PROCEDURE -->
+      <div id="tab-procedure" class="tab-content standard-text-layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Step-by-Step Procedure</div>
+          </div>
+          <div class="card-body" style="color: var(--text-muted); display: flex; flex-direction: column; gap: 1rem; line-height: 1.6;">
+            <ol style="padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+              <li>
+                <strong>Power Connection</strong>: Wire the <strong>DC SUPPLY (+)</strong> (Red — Phase (Live)) to the input of the protective resistor <strong>R<sub>S</sub> In</strong> (Red).
+              </li>
+              <li>
+                <strong>Ammeter Connection</strong>: Link the circuit ammeter terminals <strong>A(+)</strong> and <strong>A(-)</strong> to the <strong>DPM Ammeter</strong> inputs <strong>DPM A(+)</strong> and <strong>DPM A(-)</strong>.
+              </li>
+              <li>
+                <strong>Diode Selection</strong>: Patch the yellow **DIODE PORT** terminals to the desired diode (Silicon IN4007 or Germanium OA79). Connect Port Anode to diode Anode and Port Cathode to diode Cathode.
+              </li>
+              <li>
+                <strong>Voltmeter Connection</strong>: Link the circuit voltmeter terminals <strong>V(+)</strong> and <strong>V(-)</strong> to the <strong>DPM Voltmeter</strong> inputs <strong>DPM V(+)</strong> and <strong>DPM V(-)</strong>.
+              </li>
+              <li>
+                <strong>Measurements</strong>: Increment the supply voltage, and log voltage and current readings into the observation table.
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: CIRCUIT DIAGRAM -->
+      <div id="tab-circuit" class="tab-content standard-text-layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔌 Circuit Diagram &amp; Symbols</div>
+          </div>
+          <div class="card-body" style="display: flex; justify-content: center; align-items: center; padding: 2.5rem; background: #05070c;">
+            <svg width="500" height="300" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+              <!-- Lines / Wires -->
+              <path d="M 80,160 L 80,100 L 180,100 M 240,100 L 304,100 M 336,100 L 420,100 L 420,160 M 420,185 L 420,250 L 80,250 L 80,190" fill="none" stroke="#00f0ff" stroke-width="2.5" />
+              <!-- Voltmeter branch wires -->
+              <path d="M 290,100 L 290,50 L 344,50 M 376,50 L 420,50" fill="none" stroke="#00f0ff" stroke-width="2.5" />
+              
+              <!-- DC Variable Supply Symbol -->
+              <g transform="translate(80,160)">
+                <line x1="-15" y1="0" x2="15" y2="0" stroke="#ffffff" stroke-width="3" />
+                <line x1="-8" y1="10" x2="8" y2="10" stroke="#ffffff" stroke-width="2" />
+                <line x1="-15" y1="20" x2="15" y2="20" stroke="#ffffff" stroke-width="3" />
+                <line x1="-8" y1="30" x2="8" y2="30" stroke="#ffffff" stroke-width="2" />
+                <!-- arrow indicating variable supply -->
+                <line x1="-25" y1="40" x2="25" y2="-15" stroke="#00f0ff" stroke-width="2" />
+                <polygon points="25,-15 15,-13 22,-5" fill="#00f0ff" />
+                <text x="-35" y="15" fill="#ffffff" font-size="12" font-family="sans-serif">V_dc</text>
+              </g>
+              
+              <!-- Resistor RS Symbol -->
+              <g transform="translate(180,90)">
+                <rect width="60" height="20" fill="#1e1e2f" stroke="#ffffff" stroke-width="2" />
+                <text x="30" y="-8" fill="#ffffff" font-size="11" font-family="sans-serif" text-anchor="middle">Rs (1KΩ)</text>
+              </g>
+              
+              <!-- Ammeter Symbol -->
+              <g transform="translate(320,100)">
+                <circle cx="0" cy="0" r="16" fill="#1e1e2f" stroke="#ffffff" stroke-width="2" />
+                <text x="0" y="4" fill="#ffffff" font-size="12" font-family="'Orbitron', sans-serif" font-weight="bold" text-anchor="middle">A</text>
+                <text x="-12" y="-18" fill="#a1a1aa" font-size="10" font-family="sans-serif">+</text>
+                <text x="12" y="-18" fill="#a1a1aa" font-size="10" font-family="sans-serif">-</text>
+              </g>
+              
+              <!-- Diode Symbol -->
+              <g transform="translate(420,175)">
+                <!-- Triangle -->
+                <polygon points="-12,-15 12,-15 0,10" fill="#1e1e2f" stroke="#ffffff" stroke-width="2" />
+                <!-- Cathode bar -->
+                <line x1="-12" y1="10" x2="12" y2="10" stroke="#ffffff" stroke-width="3.5" />
+                <text x="25" y="0" fill="#ffffff" font-size="11" font-family="sans-serif">Diode</text>
+              </g>
+              
+              <!-- Voltmeter Symbol -->
+              <g transform="translate(360,50)">
+                <circle cx="0" cy="0" r="16" fill="#1e1e2f" stroke="#ffffff" stroke-width="2" />
+                <text x="0" y="4" fill="#ffffff" font-size="12" font-family="'Orbitron', sans-serif" font-weight="bold" text-anchor="middle">V</text>
+                <text x="-12" y="-18" fill="#a1a1aa" font-size="10" font-family="sans-serif">+</text>
+                <text x="12" y="-18" fill="#a1a1aa" font-size="10" font-family="sans-serif">-</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SIMULATION -->
+      <div id="tab-simulation" class="tab-content  trainer-grid">
+        <section class="pcb-container">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 21v-4m10 4v-4M21 7h-4M21 17h-4M7 3v4m10-4v4M3 7h4M3 17h4"/></svg>
+            TEXLA TSI-1145A Analog Trainer Panel
+          </div>
+          <div class="secondary-controls">
+            <span class="summary-metric" style="font-size: 0.75rem; color: #00f0ff;">Status: <span id="board-status-text" style="color: var(--accent-fwd);">ENERGIZED</span></span>
+          </div>
+        </div>
+        <div class="pcb-board power-on" id="pcb-board-element">
+                    <svg class="circuit-svg" viewBox="0 0 820 540" id="pcb-svg" xmlns="http://www.w3.org/2000/svg">
+            
+            <defs>
+              <!-- PCB texture and gradients -->
+              <radialGradient id="pcb-gradient" cx="50%" cy="50%" r="75%">
+                <stop offset="0%" stop-color="#0f763e" />
+                <stop offset="70%" stop-color="#0a542b" />
+                <stop offset="100%" stop-color="#073b1e" />
+              </radialGradient>
+              
+              <pattern id="pcb-dot-pattern" width="16" height="16" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="0.8" fill="#ffffff" opacity="0.04" />
+                <rect width="16" height="16" fill="none" stroke="#000000" stroke-width="0.5" opacity="0.06" />
+              </pattern>
+              
+              <!-- DPM Frame Gradients -->
+              <linearGradient id="dpm-bezel-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#6b7280" />
+                <stop offset="100%" stop-color="#4b5160" />
+              </linearGradient>
+              <linearGradient id="dpm-lip-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#1f2937" />
+                <stop offset="100%" stop-color="#111827" />
+              </linearGradient>
+              
+              <!-- Gold Solder Pad Gradient -->
+              <radialGradient id="gold-solder" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#ffe699" />
+                <stop offset="40%" stop-color="#d4af37" />
+                <stop offset="85%" stop-color="#a07c1b" />
+                <stop offset="100%" stop-color="#6e5005" />
+              </radialGradient>
+              
+              <!-- Chrome Metal Bevel Gradient -->
+              <radialGradient id="chrome-metal" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="30%" stop-color="#e2e8f0" />
+                <stop offset="70%" stop-color="#64748b" />
+                <stop offset="95%" stop-color="#334155" />
+                <stop offset="100%" stop-color="#0f172a" />
+              </radialGradient>
+              
+              <radialGradient id="chrome-center-grad" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+                <stop offset="0%" stop-color="#0b0b0d" />
+                <stop offset="60%" stop-color="#1a1a20" />
+                <stop offset="75%" stop-color="#64748b" />
+                <stop offset="90%" stop-color="#cbd5e1" />
+                <stop offset="100%" stop-color="#334155" />
+              </radialGradient>
+              
+              <!-- Raised Terminal Gradients (3D Banana Sockets) -->
+              <radialGradient id="banana-red" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#ff7878" />
+                <stop offset="55%" stop-color="#dc2626" />
+                <stop offset="100%" stop-color="#7f1d1d" />
+              </radialGradient>
+              
+              <radialGradient id="banana-black" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#6b7280" />
+                <stop offset="55%" stop-color="#1f2937" />
+                <stop offset="100%" stop-color="#030712" />
+              </radialGradient>
+              
+              <radialGradient id="banana-yellow" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#fef08a" />
+                <stop offset="55%" stop-color="#d97706" />
+                <stop offset="100%" stop-color="#78350f" />
+              </radialGradient>
+
+              <!-- Screw Head Gradient -->
+              <radialGradient id="screw-grad" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#f3f4f6" />
+                <stop offset="55%" stop-color="#9ca3af" />
+                <stop offset="100%" stop-color="#4b5563" />
+              </radialGradient>
+              
+              <!-- LED glow filter (Red) -->
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+
+              <!-- Resistor Body Gradient -->
+              <linearGradient id="resistor-body" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#c9b397" />
+                <stop offset="10%" stop-color="#e6d5c1" />
+                <stop offset="50%" stop-color="#eddcc6" />
+                <stop offset="90%" stop-color="#e6d5c1" />
+                <stop offset="100%" stop-color="#c9b397" />
+              </linearGradient>
+
+              <!-- Diode Body Gradients -->
+              <linearGradient id="diode-body" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#1f1f22" />
+                <stop offset="40%" stop-color="#4b4b50" />
+                <stop offset="70%" stop-color="#1a1a1c" />
+                <stop offset="100%" stop-color="#09090a" />
+              </linearGradient>
+
+              <linearGradient id="diode-glass" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ff9999" stop-opacity="0.65"/>
+                <stop offset="35%" stop-color="#ffdddd" stop-opacity="0.9"/>
+                <stop offset="70%" stop-color="#ef4444" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#991b1b" stop-opacity="0.85"/>
+              </linearGradient>
+            </defs>
+
+            <!-- PCB Base Board Graphic -->
+            <rect width="100%" height="100%" rx="12" fill="url(#pcb-gradient)" />
+            <rect width="100%" height="100%" rx="12" fill="url(#pcb-dot-pattern)" />
+            <rect width="100%" height="100%" rx="12" fill="none" stroke="#061c0a" stroke-width="8" />
+            
+            <!-- Silkscreen Box and Title -->
+            <g id="silkscreen-branding">
+              <!-- Outer border line -->
+              <rect x="25" y="25" width="770" height="490" rx="6" fill="none" stroke="#ffffff" stroke-width="1.8" opacity="0.85" />
+              
+              <!-- TEXLA Title Block -->
+
+              <text x="410" y="515" fill="#ffffff" font-family="'Orbitron', sans-serif" font-size="9.5" font-weight="700" text-anchor="middle" opacity="0.8" letter-spacing="0.5">TSI-1145A</text>
+              
+              <!-- Main Lab Title Box -->
+              <text x="410" y="55" fill="#ffffff" font-family="'Orbitron', sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="1.5">P.N JUNCTION DIODE CHARACTERISTICS</text>
+            </g>
+            
+            <!-- Contact info running horizontally along bottom edge -->
+            <text x="35" y="515" fill="#ffffff" opacity="0.75" font-size="8.5" font-family="sans-serif" font-weight="600">Ph 040-24652326, 9848071461 | E-Mail: mail2texla@gmail.com</text>
+
+            <!-- ==========================================================
+                 PCB COPPER INTERNAL TRACES (Silkscreen lines)
+                 ========================================================== -->
+            <g id="pcb-copper-traces">
+              <!-- GND Bus on Left connecting supply_neg to ground posts -->
+              <path class="pcb-trace" d="M 130,340 L 90,340 L 90,460 L 520,460 M 520,460 L 580,460" />
+              
+              <!-- DC Supply (+) double socket link -->
+              <path class="pcb-trace" d="M 170,340 L 210,340" stroke-dasharray="4 4" opacity="0.6" />
+              
+              <!-- RS Resistor Out to Ammeter symbol (+) -->
+              <path class="pcb-trace" d="M 310,340 L 360,340" />
+              
+              <!-- Ammeter symbol (-) to Diode Port Anode -->
+              <path class="pcb-trace" d="M 410,340 L 470,340 L 470,330 L 580,330" />
+              
+              <!-- Voltmeter symbol (-) to Diode Port Anode (Parallel connection) -->
+              <path class="pcb-trace" d="M 700,330 L 580,330" stroke-width="2.5" />
+              
+              <!-- Voltmeter symbol (+) to Diode Port Cathode (Parallel connection) -->
+              <path class="pcb-trace" d="M 700,390 L 580,390" stroke-width="2.5" />
+
+              <!-- Diode Port Cathode to GND -->
+              <path class="pcb-trace" d="M 580,390 L 580,460" />
+
+              <!-- Straight horizontal silkscreen lines on top and bottom of diode rows -->
+              <line x1="520" y1="330" x2="700" y2="330" stroke="#ffffff" stroke-width="1.5" opacity="0.8" />
+              <line x1="520" y1="390" x2="700" y2="390" stroke="#ffffff" stroke-width="1.5" opacity="0.8" />
+            </g>
+
+            <!-- ==========================================================
+                 DASHED WIRING GUIDELINES
+                 ========================================================== -->
+            <g id="pcb-wiring-guides">
+              <!-- Guide: Supply (+) to RS Left -->
+              <path class="pcb-guide" d="M 210,340 C 210,320 240,320 260,340" />
+              
+              <!-- Guide: Ammeter symbol to DPM Ammeter -->
+              <path class="pcb-guide" d="M 360,340 C 360,280 260,280 260,220" />
+              <path class="pcb-guide" d="M 410,340 C 410,280 300,280 300,220" />
+
+              <!-- Guide: Voltmeter symbol to DPM Voltmeter -->
+              <path class="pcb-guide" d="M 700,390 C 700,300 480,300 480,220" />
+              <path class="pcb-guide" d="M 700,330 C 700,280 520,280 520,220" />
+            </g>
+
+            <!-- ==========================================================
+                 HARDWARE CONTROLS (Knob, Switch, Indicator)
+                 ========================================================== -->
+
+
+            <!-- DC Variable Supply Knob -->
+            <g id="svg-dc-supply" transform="translate(150, 420)">
+              <!-- White arc scale behind knob -->
+              <path d="M -30,30 A 42,42 0 1,1 30,30" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-dasharray="1.5 5.5" opacity="0.75" />
+              
+              <text x="-36" y="24" fill="#ffffff" font-size="8" font-family="'Orbitron', sans-serif" font-weight="900" text-anchor="end">0V</text>
+              <text x="36" y="24" fill="#ffffff" font-size="8" font-family="'Orbitron', sans-serif" font-weight="900" text-anchor="start">10V</text>
+              <text x="0" y="-48" fill="#ffffff" font-size="10" font-family="'Orbitron', sans-serif" font-weight="900" text-anchor="middle">DC SUPPLY</text>
+              <text x="0" y="-38" fill="#a1a1aa" font-size="7" font-family="sans-serif" font-weight="bold" text-anchor="middle">(0-10V)</text>
+
+              <!-- +/- labels and zener arrow -->
+              <text x="-40" y="-95" fill="#ffffff" font-size="14" font-family="'Orbitron', sans-serif" font-weight="900" text-anchor="middle">-</text>
+              <text x="40" y="-95" fill="#ffffff" font-size="14" font-family="'Orbitron', sans-serif" font-weight="900" text-anchor="middle">+</text>
+              <!-- Zener variable arrow symbol -->
+              <line x1="-30" y1="-80" x2="30" y2="-80" stroke="#ffffff" stroke-width="1.5" />
+              <line x1="-20" y1="-95" x2="20" y2="-65" stroke="#ffffff" stroke-width="1.5" />
+              <polygon points="20,-65 10,-63 18,-75" fill="#ffffff" />
+              <line x1="-20" y1="-100" x2="-20" y2="-90" stroke="#ffffff" stroke-width="1.5" />
+              <line x1="20" y1="-70" x2="20" y2="-60" stroke="#ffffff" stroke-width="1.5" />
+
+              <!-- Knob Outer Bezel -->
+              <circle cx="0" cy="0" r="28" fill="url(#chrome-metal)" stroke="#222" stroke-width="1" />
+              
+              <!-- Knob Body with Knurling -->
+              <circle cx="0" cy="0" r="24" fill="#151518" />
+              
+              <!-- Inner Cap -->
+              <circle cx="0" cy="0" r="18" fill="#2d2d32" stroke="#333" stroke-width="0.5" />
+              <circle cx="0" cy="0" r="13" fill="#151518" />
+
+              <!-- Pointer Indicator: JS rotates this via rotate(angle) -->
+              <g id="supply-knob-indicator">
+                <line x1="0" y1="0" x2="0" y2="-23" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round" />
+                <circle cx="0" cy="-19" r="2" fill="#ffffff" />
+              </g>
+            </g>
+
+            <!-- Resistor RS (1K Ohm Carbon Film, Horizontal) -->
+            <g id="svg-resistor" transform="translate(260, 340)">
+              <!-- Silkscreen envelope -->
+              <rect x="-2" y="-12" width="54" height="24" rx="2" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.7" stroke-dasharray="2 2" />
+              <!-- Metal Leads -->
+              <line x1="-15" y1="0" x2="65" y2="0" stroke="#94a3b8" stroke-width="2.2" />
+              <!-- Resistor Body -->
+              <rect x="5" y="-7.5" width="40" height="15" rx="3.5" fill="url(#resistor-body)" stroke="#9c8770" stroke-width="0.5" />
+              <!-- 1K Ohm Color Bands: Brown (1), Black (0), Red (100), Gold (5%) -->
+              <rect x="13" y="-7.5" width="3.5" height="15" fill="#6f4e37" />
+              <rect x="20" y="-7.5" width="3.5" height="15" fill="#000000" />
+              <rect x="27" y="-7.5" width="3.5" height="15" fill="#ef4444" />
+              <rect x="37" y="-7.5" width="3.5" height="15" fill="#d4af37" />
+              
+              <text x="25" y="-14" fill="#ffffff" font-size="9" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="900">RS 1K</text>
+            </g>
+
+            <!-- Ammeter Symbol in Circuit -->
+            <g id="svg-ammeter-sym" transform="translate(385, 340)">
+              <circle cx="0" cy="0" r="16" fill="#0d0d12" stroke="#ffffff" stroke-width="2"/>
+              <text x="0" y="3.5" fill="#ffffff" font-size="11" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="900">A</text>
+              <text x="-22" y="4" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">+</text>
+              <text x="22" y="4" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">-</text>
+            </g>
+
+            <!-- Voltmeter Symbol in Circuit (Vertical) -->
+            <g id="svg-voltmeter-sym" transform="translate(700, 360)">
+              <circle cx="0" cy="0" r="16" fill="#0d0d12" stroke="#ffffff" stroke-width="2"/>
+              <text x="0" y="3.5" fill="#ffffff" font-size="11" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="900">V</text>
+              <text x="0" y="-22" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">-</text>
+              <text x="0" y="28" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">+</text>
+            </g>
+
+            <!-- ==========================================================
+                 DIODES BLOCK RENDERINGS (Vertical)
+                 ========================================================== -->
+            <!-- Silicon Diode IN4007 -->
+            <g id="svg-diode-si" transform="translate(520, 360) rotate(90)">
+              <!-- Schematic silkscreen symbol below component -->
+              <line x1="-30" y1="18" x2="30" y2="18" stroke="#ffffff" stroke-width="1.2" opacity="0.7" />
+              <polygon points="-5,14 10,18 -5,22" fill="#ffffff" opacity="0.7" />
+              <line x1="10" y1="14" x2="10" y2="22" stroke="#ffffff" stroke-width="1.8" opacity="0.7" />
+              
+              <!-- Component body and leads -->
+              <line x1="-30" y1="0" x2="30" y2="0" stroke="#94a3b8" stroke-width="2.2" />
+              <!-- Black Diode Body -->
+              <rect x="-18" y="-6.5" width="36" height="13" rx="1.5" fill="url(#diode-body)" stroke="#111" stroke-width="0.5" />
+              <!-- Cathode Silver Ring -->
+              <rect x="7" y="-6.5" width="5.5" height="13" fill="#cbd5e1" />
+              
+              <text x="0" y="-12" fill="#ffffff" font-size="9" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="900" transform="rotate(-90 0 -12)">IN4007</text>
+            </g>
+
+            <!-- Diode Port (DIO'S label) -->
+            <g id="svg-diode-port" transform="translate(580, 360)">
+              <text x="-12" y="0" fill="#ffffff" font-size="9" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="900" opacity="0.9" transform="rotate(-90 -12 0)">DIO'S</text>
+              <line x1="0" y1="-30" x2="0" y2="30" stroke="#ffffff" stroke-width="1.8" stroke-dasharray="2 3" opacity="0.7" />
+            </g>
+
+            <!-- Germanium Diode OA79 -->
+            <g id="svg-diode-ge" transform="translate(640, 360) rotate(90)">
+              <!-- Schematic silkscreen symbol below component -->
+              <line x1="-30" y1="18" x2="30" y2="18" stroke="#ffffff" stroke-width="1.2" opacity="0.7" />
+              <polygon points="-5,14 10,18 -5,22" fill="#ffffff" opacity="0.7" />
+              <line x1="10" y1="14" x2="10" y2="22" stroke="#ffffff" stroke-width="1.8" opacity="0.7" />
+              
+              <!-- Component body and leads -->
+              <line x1="-30" y1="0" x2="30" y2="0" stroke="#94a3b8" stroke-width="2.2" />
+              <!-- Glass Diode Body -->
+              <rect x="-18" y="-6.5" width="36" height="13" rx="3.5" fill="url(#diode-glass)" stroke="#7f1d1d" stroke-width="0.5" />
+              <!-- whisker details -->
+              <line x1="-14" y1="0" x2="-5" y2="0" stroke="#ffffff" stroke-width="0.8" opacity="0.9" />
+              <polygon points="-5,-2 -1,0 -5,2" fill="#ffffff" opacity="0.9" />
+              <path d="M -1,0 L 7,0" stroke="#52525b" stroke-width="0.7" />
+              <!-- Cathode Red Ring -->
+              <rect x="7" y="-6.5" width="4.5" height="13" fill="#ef4444" />
+              
+              <text x="0" y="-12" fill="#ffffff" font-size="9" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="900" transform="rotate(-90 0 -12)">OA79</text>
+            </g>
+
+            <!-- ==========================================================
+                 DPM HARDWARE BEZELS (Digital readings embedded)
+                 ========================================================== -->
+            <!-- Ammeter DPM Frame -->
+            <g id="dpm-am-frame" transform="translate(210, 90)">
+              <!-- Modular Green PCB Background -->
+              <rect x="-8" y="-12" width="176" height="114" rx="8" fill="url(#pcb-gradient)" stroke="#061c0a" stroke-width="3" />
+              <rect x="-8" y="-12" width="176" height="114" rx="8" fill="url(#pcb-dot-pattern)" opacity="0.6" />
+              
+
+              
+              <!-- Bezel outer box (chunky rounded-rectangle frame in slate/grey-blue) -->
+              <rect x="0" y="0" width="160" height="75" fill="url(#dpm-bezel-grad)" rx="10" stroke="#1f2937" stroke-width="3.5" />
+              <!-- Inset lip -->
+              <rect x="5" y="5" width="150" height="65" fill="none" stroke="url(#dpm-lip-grad)" stroke-width="2" rx="7" />
+              <!-- Screen Mask (matte black, rx=8.5) -->
+              <rect x="15" y="10" width="130" height="44" fill="#000000" rx="8.5" stroke="#111" stroke-width="1.5" />
+              
+              <!-- Embedded HTML Screen -->
+              <foreignObject x="15" y="10" width="130" height="44">
+                <div class="dpm-display-wrapper" xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; border: none; box-shadow: none; background: transparent; display: flex; align-items: center; justify-content: flex-end; position: relative;">
+                  <div style="position: relative; width: 92px; height: 100%; background: #000000; border-radius: 6px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; border: 1.5px solid #222;">
+                    <!-- Ghost digits (left-aligned) -->
+                    <div class="dpm-bg-digits" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%);">88</div>
+                    <!-- Live digits (right-aligned) -->
+                    <div class="dpm-fg-digits" id="ammeter-val" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">----</div>
+                  </div>
+                  <span class="dpm-unit" id="ammeter-unit-label" style="font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 900; color: #3f3f46; margin-left: 6px; width: 22px; text-align: left; transition: color 0.15s;">mA</span>
+                </div>
+              </foreignObject>
+            </g>
+
+            <!-- Voltmeter DPM Frame -->
+            <g id="dpm-vm-frame" transform="translate(450, 90)">
+              <!-- Modular Green PCB Background -->
+              <rect x="-8" y="-12" width="176" height="114" rx="8" fill="url(#pcb-gradient)" stroke="#061c0a" stroke-width="3" />
+              <rect x="-8" y="-12" width="176" height="114" rx="8" fill="url(#pcb-dot-pattern)" opacity="0.6" />
+              
+
+              
+              <!-- Bezel outer box (chunky rounded-rectangle frame in slate/grey-blue) -->
+              <rect x="0" y="0" width="160" height="75" fill="url(#dpm-bezel-grad)" rx="10" stroke="#1f2937" stroke-width="3.5" />
+              <!-- Inset lip -->
+              <rect x="5" y="5" width="150" height="65" fill="none" stroke="url(#dpm-lip-grad)" stroke-width="2" rx="7" />
+              <!-- Screen Mask (matte black, rx=8.5) -->
+              <rect x="15" y="10" width="130" height="44" fill="#000000" rx="8.5" stroke="#111" stroke-width="1.5" />
+              
+              <!-- Embedded HTML Screen -->
+              <foreignObject x="15" y="10" width="130" height="44">
+                <div class="dpm-display-wrapper" xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; border: none; box-shadow: none; background: transparent; display: flex; align-items: center; justify-content: flex-end; position: relative;">
+                  <div style="position: relative; width: 92px; height: 100%; background: #000000; border-radius: 6px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; border: 1.5px solid #222;">
+                    <!-- Ghost digits (left-aligned) -->
+                    <div class="dpm-bg-digits" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%);">88</div>
+                    <!-- Live digits (right-aligned) -->
+                    <div class="dpm-fg-digits" id="voltmeter-val" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">----</div>
+                  </div>
+                  <span class="dpm-unit" id="voltmeter-unit-label" style="font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 900; color: #3f3f46; margin-left: 6px; width: 22px; text-align: left; transition: color 0.15s;">V</span>
+                </div>
+              </foreignObject>
+            </g>
+
+            <!-- Stacked Range Selector Switches in the middle gap -->
+            <!-- Ammeter Range Selector Switch (Top) -->
+            <g id="svg-ammeter-range" transform="translate(410, 105)">
+              <rect x="-15" y="-12" width="30" height="24" rx="2" fill="#2d2d30" stroke="#5a5a60" stroke-width="1" />
+              <text id="btn-arange-ua" x="0" y="-16" fill="#a1a1aa" font-size="7.5" font-family="'Orbitron', sans-serif" font-weight="bold" text-anchor="middle" cursor="pointer" onclick="setAmmeterRange('20000uA')">2000uA</text>
+              <text id="btn-arange-ma" x="0" y="22" fill="#a1a1aa" font-size="7.5" font-family="'Orbitron', sans-serif" font-weight="bold" text-anchor="middle" cursor="pointer" onclick="setAmmeterRange('200mA')" class="active-fwd">200MA</text>
+              <circle cx="0" cy="0" r="3.5" fill="#151518" stroke="#333" stroke-width="0.5" />
+              <line x1="0" y1="0" x2="0" y2="-10" stroke="#ef4444" stroke-width="2" stroke-linecap="round" id="am-range-switch-lever" />
+            </g>
+
+            <!-- Voltmeter Range Selector Switch (Bottom) -->
+            <g id="svg-voltmeter-range" transform="translate(410, 165)">
+              <rect x="-15" y="-12" width="30" height="24" rx="2" fill="#2d2d30" stroke="#5a5a60" stroke-width="1" />
+              <text id="btn-vrange-mv" x="0" y="-16" fill="#a1a1aa" font-size="7.5" font-family="'Orbitron', sans-serif" font-weight="bold" text-anchor="middle" cursor="pointer" onclick="setVoltmeterRange('2000mV')">2000mV</text>
+              <text id="btn-vrange-v" x="0" y="22" fill="#a1a1aa" font-size="7.5" font-family="'Orbitron', sans-serif" font-weight="bold" text-anchor="middle" cursor="pointer" onclick="setVoltmeterRange('20V')" class="active-fwd">20V</text>
+              <circle cx="0" cy="0" r="3.5" fill="#151518" stroke="#333" stroke-width="0.5" />
+              <line x1="0" y1="0" x2="0" y2="-10" stroke="#ef4444" stroke-width="2" stroke-linecap="round" id="vm-range-switch-lever" />
+            </g>
+
+            <!-- AMMETER Label & Sockets (Middle Row Left) -->
+            <g transform="translate(290, 200)">
+              <text x="0" y="-10" fill="#ffffff" font-size="9" font-family="'Orbitron', sans-serif" font-weight="900" text-anchor="middle" letter-spacing="1.0">AMMETER</text>
+            </g>
+
+            <!-- VOLTMETER Label & Sockets (Middle Row Right) -->
+            <g transform="translate(530, 200)">
+              <text x="0" y="-10" fill="#ffffff" font-size="9" font-family="'Orbitron', sans-serif" font-weight="900" text-anchor="middle" letter-spacing="1.0">VOLTMETER</text>
+            </g>
+
+            <!-- Mounting Screws -->
+            <g id="mounting-screws">
+              <g transform="translate(15, 15)">
+                <circle cx="0" cy="0" r="5" fill="url(#screw-grad)" stroke="#334155" stroke-width="0.5" />
+                <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#1e293b" stroke-width="1" />
+                <line x1="-2.5" y1="2.5" x2="2.5" y2="-2.5" stroke="#1e293b" stroke-width="1" />
+              </g>
+              <g transform="translate(805, 15)">
+                <circle cx="0" cy="0" r="5" fill="url(#screw-grad)" stroke="#334155" stroke-width="0.5" />
+                <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#1e293b" stroke-width="1" />
+                <line x1="-2.5" y1="2.5" x2="2.5" y2="-2.5" stroke="#1e293b" stroke-width="1" />
+              </g>
+              <g transform="translate(410, 15)">
+                <circle cx="0" cy="0" r="5" fill="url(#screw-grad)" stroke="#334155" stroke-width="0.5" />
+                <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#1e293b" stroke-width="1" />
+                <line x1="-2.5" y1="2.5" x2="2.5" y2="-2.5" stroke="#1e293b" stroke-width="1" />
+              </g>
+              <g transform="translate(410, 525)">
+                <circle cx="0" cy="0" r="5" fill="url(#screw-grad)" stroke="#334155" stroke-width="0.5" />
+                <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#1e293b" stroke-width="1" />
+                <line x1="-2.5" y1="2.5" x2="2.5" y2="-2.5" stroke="#1e293b" stroke-width="1" />
+              </g>
+              <g transform="translate(15, 525)">
+                <circle cx="0" cy="0" r="5" fill="url(#screw-grad)" stroke="#334155" stroke-width="0.5" />
+                <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#1e293b" stroke-width="1" />
+                <line x1="-2.5" y1="2.5" x2="2.5" y2="-2.5" stroke="#1e293b" stroke-width="1" />
+              </g>
+              <g transform="translate(805, 525)">
+                <circle cx="0" cy="0" r="5" fill="url(#screw-grad)" stroke="#334155" stroke-width="0.5" />
+                <line x1="-2.5" y1="-2.5" x2="2.5" y2="2.5" stroke="#1e293b" stroke-width="1" />
+                <line x1="-2.5" y1="2.5" x2="2.5" y2="-2.5" stroke="#1e293b" stroke-width="1" />
+              </g>
+            </g>
+
+            <!-- ==========================================================
+                 WIRING LAYER (DYNAMICALLY RENDERED BY JS)
+                 ========================================================== -->
+            <g id="wires-layer"></g>
+
+            <!-- ==========================================================
+                 INTERACTIVE SOCKET TERMINAL JACKS
+                 ========================================================== -->
+            <!-- Sockets are rendered as interactive overlay groups -->
+            <g id="terminals-layer"></g>
+
+          </svg>
+        </div>
+        </section>
+
+        <section class="card" aria-label="Controls">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            Control Console
+          </div>
+          <div class="secondary-controls">
+            <button class="nav-btn" onclick="toggleTheory()">Theory</button>
+            <button class="nav-btn" onclick="toggleProcedure()">Guide</button>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <div class="console-column" style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+
+          <!-- Color Palette Picker -->
+          <div class="control-group">
+            <label class="control-label">Active Patch-Wire Color</label>
+            <div class="color-picker">
+              <span class="palette-circle active-color" style="background: #ef4444;" onclick="selectWireColor('#ef4444', this)" title="Red — Phase (Live)"></span>
+              <span class="palette-circle" style="background: #1e293b;" onclick="selectWireColor('#1e293b', this)" title="Black — Neutral"></span>
+              <span class="palette-circle" style="background: #eab308;" onclick="selectWireColor('#eab308', this)" title="Yellow — Short Circuit / Fault Indicator"></span>
+              <span class="palette-circle" style="background: #0891b2;" onclick="selectWireColor('#0891b2', this)" title="Blue wire"></span>
+              <span class="palette-circle" style="background: #10b981;" onclick="selectWireColor('#10b981', this)" title="Green wire"></span>
+            </div>
+          </div>
+          </div>
+
+          <!-- DC Supply Slider -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>DC Supply Voltage (V<sub>supply</sub>)</span>
+              <span class="control-val-display" id="supply-val-text">0.0 V</span>
+            </div>
+            <div class="slider-input-container">
+              <input type="range" class="voltage-slider" id="supply-slider" min="0" max="10" step="0.1" value="0" oninput="updateSupplyFromSlider()">
+              <input type="number" class="num-input" id="supply-num" min="0" max="10" step="0.1" value="0.0" onchange="updateSupplyFromNum()">
+            </div>
+          </div>
+
+          <!-- Circuit Connectivity Status -->
+          <div class="status-panel">
+            <span class="status-title">Circuit Wiring Checklist</span>
+            
+            <div class="checklist-item">
+              <span class="chk-icon fail" id="chk-supply-icon">⛌</span>
+              <span class="chk-text" id="chk-supply-text">Supply (+) to Resistor RS In</span>
+            </div>
+            
+            <div class="checklist-item">
+              <span class="chk-icon fail" id="chk-ammeter-icon">⛌</span>
+              <span class="chk-text" id="chk-ammeter-text">Ammeter Symbol to DPM Ammeter</span>
+            </div>
+
+            <div class="checklist-item">
+              <span class="chk-icon fail" id="chk-diode-icon">⛌</span>
+              <span class="chk-text" id="chk-diode-text">Diode Patched to circuit port</span>
+            </div>
+
+            <div class="checklist-item">
+              <span class="chk-icon fail" id="chk-voltmeter-icon">⛌</span>
+              <span class="chk-text" id="chk-voltmeter-text">Voltmeter Symbol to DPM Voltmeter</span>
+            </div>
+          </div>
+
+          <!-- Controls Grid -->
+          <div class="btn-grid">
+            <button class="btn btn-success" id="btn-record" onclick="recordReading()" disabled>
+              📋 Log Data
+            </button>
+            <button class="btn btn-primary" id="btn-autofill" onclick="autoFillTable()" disabled>
+              🔄 Auto-Log
+            </button>
+            <button class="btn btn-primary" id="btn-sweep" onclick="triggerSweepAnimation()" disabled style="grid-column: span 2;">
+              ▶ Plot Full Curve Sweep
+            </button>
+            <button class="btn" id="btn-overlay" onclick="toggleOverlayCompare()">
+              ⊕ Compare Si vs Ge
+            </button>
+            <button class="btn btn-danger" onclick="clearWires()">
+              🗑️ Clear Wires
+            </button>
+            <button class="btn btn-primary" onclick="autoWireCircuit()" style="grid-column: span 2;">
+              🔌 Auto-Wire Circuit
+            </button>
+            <button class="btn" onclick="resetAll()" style="grid-column: span 2;">
+              ↺ Reset Lab
+            </button>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <!-- TAB: OBSERVATION -->
+      <!-- TAB 2: V-I PLOT & DATA -->
+      <div id="tab-observation" class="tab-content analysis-grid">
+        <div class="card graph-card" id="step-graph-container">
+          <div class="graph-toolbar">
+            <div class="card-title" style="font-size: 0.8rem;">
+              📈 V-I Characteristics
+            </div>
+            <div class="graph-legend">
+              <div class="legend-item"><span class="legend-color legend-si"></span>Si</div>
+              <div class="legend-item"><span class="legend-color legend-ge"></span>Ge</div>
+              <div class="legend-item"><span class="legend-color legend-cur"></span>Live</div>
+            </div>
+            <div class="secondary-controls">
+              <button class="nav-btn" onclick="zoomGraph(0.5)">🔍 In</button>
+              <button class="nav-btn" onclick="zoomGraph(2.0)">🔍 Out</button>
+              <button class="nav-btn" onclick="resetZoom()">Reset</button>
+            </div>
+          </div>
+          <div class="graph-container">
+            <canvas id="vi-graph"></canvas>
+          </div>
+        </div>
+
+        <section class="card table-section" id="step-table-container">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Observation Table
+          </div>
+          <div class="secondary-controls">
+            <button class="nav-btn" onclick="clearTable()">🗑️ Clear</button>
+            <button class="nav-btn" id="btn-export" onclick="exportCSV()" disabled>📥 Export CSV</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table id="obs-table">
+            <thead>
+              <tr id="table-headers">
+                <th>S.No</th>
+                <th>Supply V (V)</th>
+                <th>V<sub>d</sub> (V)</th>
+                <th>I<sub>d</sub> (mA)</th>
+                <th>P<sub>d</sub> (mW)</th>
+                <th>Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr>
+                <td colspan="6" class="empty-table-msg">No readings recorded yet. Setup wiring, set bench power to ON, adjust voltage, and click 'Log Data'.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-summary-bar">
+          <div class="summary-metric">
+            Diode Type (Patched): <span id="summary-diode" style="color: var(--accent-primary);">NONE (UNWIRED)</span>
+          </div>
+          <div class="summary-metric">
+            Knee Voltage (Derived): <span id="summary-knee">-</span>
+          </div>
+          <div class="summary-metric">
+            Power Dissipation: <span id="summary-power">-</span>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <!-- TAB: RESULT -->
+      <div id="tab-result" class="tab-content standard-text-layout">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📝 Experimental Findings &amp; Result</div>
+          </div>
+          <div class="card-body" style="color: var(--text-muted); display: flex; flex-direction: column; gap: 1rem; line-height: 1.6;">
+            <div class="status-panel" style="background: rgba(0, 240, 255, 0.03); border-color: rgba(0, 240, 255, 0.15); padding: 1.25rem;">
+              <span class="status-title" style="color: var(--accent-primary); font-size: 0.85rem; font-weight: bold;">Calculated Parameters (Live)</span>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 0.75rem;">
+                <div class="summary-metric">
+                  Diode Under Test: <span id="res-diode" style="color: var(--text-main); font-weight: bold; font-family: var(--font-led);">-</span>
+                </div>
+                <div class="summary-metric">
+                  Knee Voltage (V<sub>knee</sub>): <span id="res-knee" style="color: var(--accent-primary); font-weight: bold; font-family: var(--font-led);">-</span>
+                </div>
+                <div class="summary-metric">
+                  Peak Power Dissipated: <span id="res-power" style="color: var(--accent-primary); font-weight: bold; font-family: var(--font-led);">-</span>
+                </div>
+              </div>
+            </div>
+            
+            <h3 style="color: var(--text-main); font-size: 0.95rem; margin-top: 0.75rem; border-left: 3px solid var(--accent-primary); padding-left: 0.5rem;">Conclusions</h3>
+            <ul style="padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;">
+              <li>The Volt-Ampere (V-I) characteristics curves have been plotted successfully under forward and reverse bias.</li>
+              <li>For the Silicon diode (IN4007), the barrier potential (knee voltage) is found to be approximately <strong>0.7 V</strong>.</li>
+              <li>For the Germanium diode (OA79), the barrier potential (knee voltage) is found to be approximately <strong>0.3 V</strong>.</li>
+              <li>Under reverse bias, a negligible reverse saturation current (leakage current) flows because of minor carriers, confirming high reverse resistance.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>P.N. Junction Diode Characteristics Virtual Laboratory &copy; 2026. Made for COLLEGE EXPO. Powered by Shockley Physics Solver.</p>
+    </footer>
+
+  </div>
+
+  <!-- SLIDE DRAWER: THEORY PANEL -->
+  <div class="drawer-overlay" id="theory-overlay" onclick="toggleTheory()"></div>
+  <div class="drawer" id="theory-drawer">
+    <div class="drawer-header">
+      <h2>PN Diode Theory</h2>
+      <button class="drawer-close" onclick="toggleTheory()">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <h3>1. Basic PN Junction Physics</h3>
+      <p>A P.N. junction is formed by joining p-type and n-type semiconductor materials. Conduction occurs rapidly after crossing the <i>knee voltage</i> (cut-in voltage) of ~0.7V for Silicon and ~0.3V for Germanium.</p>
+      
+      <h3>2. Shockley Diode Equation</h3>
+      <p>The relationship between the voltage across the diode (V<sub>d</sub>) and the current (I<sub>d</sub>) is governed by the Shockley equation:</p>
+      <div class="math-block">
+        I<sub>d</sub> = I<sub>s</sub> * ( e<sup>V<sub>d</sub> / (n * V<sub>t</sub>)</sup> - 1 )
+      </div>
+      <p>Where:</p>
+      <ul>
+        <li><strong>I<sub>s</sub></strong>: Reverse Saturation Current. (Silicon ≈ 10<sup>-12</sup> A, Germanium ≈ 10<sup>-6</sup> A)</li>
+        <li><strong>n</strong>: Ideality factor (1.0 for Si, 1.2 for Ge)</li>
+        <li><strong>V<sub>t</sub></strong>: Thermal voltage. At room temp (25°C), V<sub>t</sub> ≈ 25.85 mV</li>
+      </ul>
+
+      <h3>3. Patch Connection & Bias Polarity</h3>
+      <p>In this analog simulation, you must build the circuit yourself. By connecting wires from the **DIODE PORT** to the Silicon or Germanium terminals, you insert the diode. 
+      - **Forward Bias**: Connect Port-Anode (+) to Diode Anode (left) and Port-Cathode (-) to Diode Cathode (right).
+      - **Reverse Bias**: Reverse these connections (cross-wire) so Port-Anode (+) goes to Diode Cathode (right) and Port-Cathode (-) goes to Diode Anode (left).</p>
+    </div>
+  </div>
+
+  <!-- SLIDE DRAWER: PROCEDURE PANEL -->
+  <div class="drawer-overlay" id="procedure-overlay" onclick="toggleProcedure()"></div>
+  <div class="drawer" id="procedure-drawer">
+    <div class="drawer-header">
+      <h2>Step-by-Step Guide</h2>
+      <button class="drawer-close" onclick="toggleProcedure()">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <p style="font-size: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+        Click on any step below to highlight the corresponding terminals on the board.
+      </p>
+
+      <div class="step-item active-step" id="proc-step-1" onclick="selectStep(1)">
+        <h4>Step 1: Connect Power to Resistor</h4>
+        <p>Click **DC SUPPLY (+)** (Red — Phase (Live)) and connect it to **RS In** (Red). This places the series resistor into the supply line.</p>
+      </div>
+
+      <div class="step-item" id="proc-step-2" onclick="selectStep(2)">
+        <h4>Step 2: Connect Series Ammeter</h4>
+        <p>Wire the Ammeter symbol to the DPM Ammeter. Connect **A +** (Red) to **DPM A+** (Red), and **A -** (Black) to **DPM A-** (Black).</p>
+      </div>
+
+      <div class="step-item" id="proc-step-3" onclick="selectStep(3)">
+        <h4>Step 3: Patch Diode (Silicon Forward Bias)</h4>
+        <p>Connect **Port A** (Yellow) to **IN4007 A** (Yellow) and **Port C** (Yellow) to **IN4007 C** (Yellow).</p>
+      </div>
+
+      <div class="step-item" id="proc-step-4" onclick="selectStep(4)">
+        <h4>Step 4: Connect Parallel Voltmeter</h4>
+        <p>Wire the Voltmeter symbol to the DPM Voltmeter. Connect **V +** (Red) to **DPM V+** (Red), and **V -** (Black) to **DPM V-** (Black).</p>
+      </div>
+
+      <div class="step-item" id="proc-step-5" onclick="selectStep(5)">
+        <h4>Step 5: Sweep & Record</h4>
+        <p>Sweep the supply voltage from 0V to 10V using the DC supply knob. Record points into the table or run a sweep plot.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT SIMULATION ENGINE
+       ========================================================================== -->
+  <script>
+    // ==========================================
+    // TERMINAL POSITIONS
+    // ==========================================
+    const Terminals = {
+      // Supply
+      supply_pos_1: { x: 170, y: 340, label: "DC SUPPLY +", color: "red", labelDir: "top" },
+      supply_pos_2: { x: 210, y: 340, label: "DC SUPPLY +", color: "red", labelDir: "top" },
+      supply_neg_1: { x: 130, y: 340, label: "DC SUPPLY -", color: "black", labelDir: "top" },
+      supply_neg_2: { x: 90,  y: 340, label: "DC SUPPLY -", color: "black", labelDir: "top" },
+      
+      // Resistor RS
+      rs_left: { x: 260, y: 340, label: "RS In", color: "red", labelDir: "top" },
+      rs_right: { x: 310, y: 340, label: "RS Out", color: "red", labelDir: "top" },
+      
+      // Ammeter Symbol in Circuit
+      am_sym_pos: { x: 360, y: 340, label: "A +", color: "red", labelDir: "top" },
+      am_sym_neg: { x: 410, y: 340, label: "A -", color: "black", labelDir: "top" },
+      
+      // Voltmeter Symbol in Circuit
+      vm_sym_neg: { x: 700, y: 330, label: "V -", color: "black", labelDir: "top" },
+      vm_sym_pos: { x: 700, y: 390, label: "V +", color: "red", labelDir: "bottom" },
+      
+      // Diode Circuit Port (Yellow posts)
+      diodes_l: { x: 580, y: 330, label: "Port A", color: "yellow", labelDir: "top" },
+      diodes_r: { x: 580, y: 390, label: "Port C", color: "yellow", labelDir: "bottom" },
+      
+      // Silicon Diode (Yellow posts)
+      si_anode: { x: 520, y: 330, label: "IN4007 A", color: "yellow", labelDir: "top" },
+      si_cathode: { x: 520, y: 390, label: "IN4007 C", color: "yellow", labelDir: "bottom" },
+      
+      // Germanium Diode (Yellow posts)
+      ge_anode: { x: 640, y: 330, label: "OA79 A", color: "yellow", labelDir: "top" },
+      ge_cathode: { x: 640, y: 390, label: "OA79 C", color: "yellow", labelDir: "bottom" },
+      
+      // Ground posts
+      gnd_1: { x: 520, y: 460, label: "GND", color: "black", labelDir: "bottom" },
+      gnd_2: { x: 580, y: 460, label: "GND", color: "black", labelDir: "bottom" },
+      
+      // DPM Ammeter input terminals
+      dpm_am_pos: { x: 260, y: 220, label: "DPM A+", color: "red", labelDir: "top" },
+      dpm_am_neg: { x: 300, y: 220, label: "DPM A-", color: "black", labelDir: "top" },
+      
+      // DPM Voltmeter input terminals
+      dpm_vm_pos: { x: 480, y: 220, label: "DPM V+", color: "red", labelDir: "top" },
+      dpm_vm_neg: { x: 520, y: 220, label: "DPM V-", color: "black", labelDir: "top" },
+    };
+
+    // ==========================================
+    // SIMULATION STATE
+    // ==========================================
+    const state = {
+      powerOn: true,
+      vSupply: 0.0, // DC Supply Voltage (V)
+      rs: 1000.0, // Fixed resistor (ohms)
+      voltmeterRange: '20V', // '2000mV' or '20V'
+      ammeterRange: '200mA', // '20000uA' or '200mA'
+      
+      // Active patch wires
+      wires: [], // elements: { id, from, to, color }
+      wireIdCounter: 0,
+      selectedTerminal: null,
+      activeWireColor: '#ef4444', // default Red
+      
+      // Dynamic solved state
+      circuitConnected: false,
+      voltmeterConnected: false,
+      voltmeterPolarity: 1.0,
+      diodeType: null, // 'Si' or 'Ge'
+      biasMode: null, // 'forward' or 'reverse'
+      
+      vd: 0.0, // Solved voltage
+      id: 0.0, // Solved current
+      
+      // Recorded readings
+      tableData: [],
+      compareOverlay: false,
+      zoomLevel: 1.0,
+      activeStep: 1
+    };
+
+    // Constant Diode Physics Parameters
+    const PHYSICS = {
+      Si: {
+        Is: 1e-12, // Saturation current (A)
+        n: 1.0,    // Ideality factor
+        Vt: 0.02585, // Thermal voltage (V) at 25C
+        knee: 0.7,
+        label: 'IN4007 (Silicon)'
+      },
+      Ge: {
+        Is: 1e-6,  // Saturation current (A)
+        n: 1.2,    // Ideality factor
+        Vt: 0.02585, // Thermal voltage (V) at 25C
+        knee: 0.3,
+        label: 'OA79 (Germanium)'
+      }
+    };
+
+    let graphLimits = {
+      maxV_fwd: 1.2,
+      maxV_rev: -10.0,
+      maxI_fwd: 15.0, // mA
+      maxI_rev: -50.0  // uA
+    };
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      initGraph();
+      renderTerminalJacks();
+      updateMeters();
+      runCircuitAnalysis();
+      selectStep(1);
+      initKnobDrag();
+    });
+
+    // ==========================================
+    // DC SUPPLY ROTARY KNOB DRAG INTERACTION
+    // ==========================================
+    let isDraggingKnob = false;
+
+    function initKnobDrag() {
+      const knob = document.getElementById('svg-dc-supply');
+      if (!knob) return;
+      
+      knob.addEventListener('mousedown', startKnobDrag);
+      knob.addEventListener('touchstart', startKnobDrag, { passive: false });
+    }
+
+    function startKnobDrag(e) {
+      if (!state.powerOn) {
+        showToast("Turn ON the bench power to adjust supply voltage.", "warning");
+        return;
+      }
+      e.preventDefault();
+      isDraggingKnob = true;
+      document.body.style.userSelect = 'none'; // prevent text selection
+      
+      updateKnobFromEvent(e);
+
+      window.addEventListener('mousemove', handleKnobDrag);
+      window.addEventListener('touchmove', handleKnobDrag, { passive: false });
+      window.addEventListener('mouseup', stopKnobDrag);
+      window.addEventListener('touchend', stopKnobDrag);
+    }
+
+    function handleKnobDrag(e) {
+      if (!isDraggingKnob) return;
+      e.preventDefault();
+      updateKnobFromEvent(e);
+    }
+
+    function stopKnobDrag(e) {
+      if (isDraggingKnob) {
+        isDraggingKnob = false;
+        document.body.style.userSelect = '';
+        window.removeEventListener('mousemove', handleKnobDrag);
+        window.removeEventListener('touchmove', handleKnobDrag);
+        window.removeEventListener('mouseup', stopKnobDrag);
+        window.removeEventListener('touchend', stopKnobDrag);
+      }
+    }
+
+    function updateKnobFromEvent(e) {
+      const svg = document.getElementById('pcb-svg');
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX || (e.touches && e.touches[0].clientX);
+      pt.y = e.clientY || (e.touches && e.touches[0].clientY);
+      
+      const svgCoords = pt.matrixTransform(svg.getScreenCTM().inverse());
+      
+      // Center of the knob is at (150, 420)
+      const cx = 150;
+      const cy = 420;
+      
+      const dx = svgCoords.x - cx;
+      const dy = svgCoords.y - cy;
+      
+      let deg = Math.atan2(dy, dx) * 180 / Math.PI;
+      let angle = deg + 90; // shift so 12 o'clock is 0
+      if (angle < 0) angle += 360;
+      
+      // Clamp to range [0, 270]
+      if (angle > 270) {
+        if (angle < 315) {
+          angle = 270;
+        } else {
+          angle = 0;
+        }
+      }
+      
+      const vSupply = (angle / 270.0) * 10.0;
+      state.vSupply = Math.max(0.0, Math.min(10.0, vSupply));
+      
+      // Update UI elements to sync
+      document.getElementById('supply-slider').value = state.vSupply;
+      document.getElementById('supply-num').value = state.vSupply.toFixed(1);
+      document.getElementById('supply-val-text').innerText = `${state.vSupply.toFixed(1)} V`;
+      document.getElementById('supply-knob-indicator').setAttribute('transform', `rotate(${angle})`);
+      
+      runSimulationUpdate();
+    }
+
+    // ==========================================
+    // RENDER INTERACTIVE TERMINALS
+    // ==========================================
+    function renderTerminalJacks() {
+      const parent = document.getElementById('terminals-layer');
+      parent.innerHTML = '';
+
+      Object.entries(Terminals).forEach(([id, t]) => {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'terminal-socket');
+        g.setAttribute('id', `socket-${id}`);
+        g.setAttribute('onclick', `selectTerminal("${id}")`);
+
+        // Color mapping for physical banana jacks
+        let fillCol = '#dc2626'; // red
+        let borderCol = '#991b1b';
+        if (t.color === 'black') {
+          fillCol = '#1e293b';
+          borderCol = '#0f172a';
+        } else if (t.color === 'yellow') {
+          fillCol = '#eab308';
+          borderCol = '#a16207';
+        }
+
+        // Jack outer metal ring
+        const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        outer.setAttribute('cx', t.x);
+        outer.setAttribute('cy', t.y);
+        outer.setAttribute('r', '9');
+        outer.setAttribute('class', 'outer-ring');
+        outer.setAttribute('fill', 'none');
+        outer.setAttribute('stroke', borderCol);
+        outer.setAttribute('stroke-width', '1.5');
+        g.appendChild(outer);
+
+        // Jack colored plastic body
+        const body = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        body.setAttribute('cx', t.x);
+        body.setAttribute('cy', t.y);
+        body.setAttribute('r', '7.5');
+        body.setAttribute('fill', fillCol);
+        g.appendChild(body);
+
+        // Metal contact center hole
+        const center = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        center.setAttribute('cx', t.x);
+        center.setAttribute('cy', t.y);
+        center.setAttribute('r', '3.5');
+        center.setAttribute('fill', '#111115');
+        g.appendChild(center);
+
+        // Hover text tooltip label
+        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        title.textContent = t.label;
+        g.appendChild(title);
+
+        parent.appendChild(g);
+      });
+    }
+
+    // ==========================================
+    // PATCH WIRE MECHANICS (Bezier Droop Generation)
+    // ==========================================
+    function selectTerminal(id) {
+      if (state.selectedTerminal === null) {
+        state.selectedTerminal = id;
+        document.getElementById(`socket-${id}`).classList.add('terminal-selected');
+      } else {
+        const prevId = state.selectedTerminal;
+        document.getElementById(`socket-${prevId}`).classList.remove('terminal-selected');
+        state.selectedTerminal = null;
+
+        if (prevId === id) return; // clicked same terminal
+
+        // Check if wire already exists
+        const exists = state.wires.some(w => 
+          (w.from === prevId && w.to === id) || (w.from === id && w.to === prevId)
+        );
+        if (exists) {
+          showToast("Terminals already connected by a wire.", "warning");
+          return;
+        }
+
+        // Draw new wire
+        state.wireIdCounter = (state.wireIdCounter || 0) + 1;
+        const wireId = `wire_${Date.now()}_${state.wireIdCounter}`;
+        state.wires.push({
+          id: wireId,
+          from: prevId,
+          to: id,
+          color: state.activeWireColor
+        });
+
+        drawWires();
+        runCircuitAnalysis();
+      }
+    }
+
+    function drawWires() {
+      const layer = document.getElementById('wires-layer');
+      
+      // Get active wire IDs
+      const activeIds = new Set(state.wires.map(w => w.id));
+      
+      // Remove paths that are no longer in state.wires
+      const children = Array.from(layer.childNodes);
+      children.forEach(child => {
+        if (child.id && !activeIds.has(child.id)) {
+          layer.removeChild(child);
+        }
+      });
+      
+      // Add or update paths
+      state.wires.forEach(w => {
+        let path = document.getElementById(w.id);
+        const pathStr = calculateWirePath(w.from, w.to);
+        
+        if (path) {
+          // Existing path, update if necessary
+          if (path.getAttribute('d') !== pathStr) {
+            path.setAttribute('d', pathStr);
+          }
+          if (path.getAttribute('stroke') !== w.color) {
+            path.setAttribute('stroke', w.color);
+          }
+        } else {
+          // New path, create and append
+          path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('id', w.id);
+          path.setAttribute('d', pathStr);
+          if (w.staged) {
+            path.setAttribute('class', 'patch-wire');
+            path.style.opacity = '0';
+          } else {
+            path.setAttribute('class', 'patch-wire entrance');
+          }
+          path.setAttribute('stroke', w.color);
+          path.setAttribute('stroke-width', '5.5');
+          path.setAttribute('filter', 'drop-shadow(0 2px 3px rgba(0,0,0,0.5))');
+          path.setAttribute('onclick', `deleteWire("${w.id}")`);
+
+          // Hover label
+          const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+          title.textContent = "Click to remove wire";
+          path.appendChild(title);
+
+          layer.appendChild(path);
+        }
+      });
+    }
+
+    function calculateWirePath(fromId, toId) {
+      const t1 = Terminals[fromId];
+      const t2 = Terminals[toId];
+      if (!t1 || !t2) return '';
+
+      const x1 = t1.x;
+      const y1 = t1.y;
+      const x2 = t2.x;
+      const y2 = t2.y;
+
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Midpoint
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+
+      // Natural gravitational sag
+      const sag = Math.max(45, dist * 0.25) + Math.abs(dx) * 0.12;
+      const cx = mx;
+      const cy = my + sag;
+
+      return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
+    }
+
+    function deleteWire(wireId) {
+      state.wires = state.wires.filter(w => w.id !== wireId);
+      drawWires();
+      runCircuitAnalysis();
+      showToast("Patch wire removed.", "warning");
+    }
+
+    function clearWires() {
+      state.wires = [];
+      if (state.selectedTerminal) {
+        document.getElementById(`socket-${state.selectedTerminal}`).classList.remove('terminal-selected');
+        state.selectedTerminal = null;
+      }
+      drawWires();
+      runCircuitAnalysis();
+      showToast("All patch wires cleared.", "warning");
+    }
+
+    function autoWireCircuit() {
+      // Clear existing wires first
+      state.wires = [];
+      if (state.selectedTerminal) {
+        const selectedEl = document.getElementById(`socket-${state.selectedTerminal}`);
+        if (selectedEl) selectedEl.classList.remove('terminal-selected');
+        state.selectedTerminal = null;
+      }
+      drawWires();
+      runCircuitAnalysis();
+
+      const wiresToCreate = [
+        { from: 'supply_pos_1', to: 'rs_left', color: '#ef4444' }, // Red — Phase (Live)
+        { from: 'am_sym_pos', to: 'dpm_am_pos', color: '#ef4444' }, // Red — Phase (Live)
+        { from: 'am_sym_neg', to: 'dpm_am_neg', color: '#1e293b' }, // Black — Neutral
+        { from: 'diodes_l', to: 'si_anode', color: '#eab308' }, // Yellow — Patch
+        { from: 'diodes_r', to: 'si_cathode', color: '#eab308' }, // Yellow — Patch
+        { from: 'vm_sym_pos', to: 'dpm_vm_pos', color: '#ef4444' }, // Red — Phase (Live)
+        { from: 'vm_sym_neg', to: 'dpm_vm_neg', color: '#1e293b' } // Black — Neutral
+      ];
+
+      const createdWires = wiresToCreate.map(w => {
+        state.wireIdCounter = (state.wireIdCounter || 0) + 1;
+        const wireId = `wire_${Date.now()}_${state.wireIdCounter}`;
+        return {
+          id: wireId,
+          from: w.from,
+          to: w.to,
+          color: w.color,
+          staged: true
+        };
+      });
+
+      state.wires.push(...createdWires);
+
+      drawWires();
+      runCircuitAnalysis();
+      showToast("Circuit auto-wired (Silicon Forward Bias).", "info");
+
+      createdWires.forEach((w, index) => {
+        setTimeout(() => {
+          // Find the wire in state.wires and remove staged flag
+          const wireInState = state.wires.find(item => item.id === w.id);
+          if (wireInState) {
+            delete wireInState.staged;
+          }
+
+          // Trigger the CSS entrance animation on the new DOM element
+          const pathEl = document.getElementById(w.id);
+          if (pathEl) {
+            pathEl.style.opacity = '';
+            pathEl.classList.add('entrance');
+          }
+        }, index * 75);
+      });
+    }
+
+    function selectWireColor(color, element) {
+      state.activeWireColor = color;
+      // Update UI active class
+      const circles = document.querySelectorAll('.palette-circle');
+      circles.forEach(c => c.classList.remove('active-color'));
+      element.classList.add('active-color');
+    }
+
+    // ==========================================
+    // ELECTRICAL GRAPH SOLVER & CONNECTIVITY
+    // ==========================================
+    function areConnectedUserWires(node1, node2) {
+      // Adjacency for user wires only
+      const userAdj = {};
+      Object.keys(Terminals).forEach(n => userAdj[n] = []);
+      state.wires.forEach(w => {
+        userAdj[w.from].push(w.to);
+        userAdj[w.to].push(w.from);
+      });
+
+      const q = [node1];
+      const visited = new Set([node1]);
+      while (q.length > 0) {
+        const curr = q.shift();
+        if (curr === node2) return true;
+        for (let neighbor of userAdj[curr]) {
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            q.push(neighbor);
+          }
+        }
+      }
+      return false;
+    }
+
+    function checkCircuitState() {
+      const adj = {};
+      const terminalsList = Object.keys(Terminals);
+      terminalsList.forEach(t => adj[t] = []);
+
+      // 1. Add user wires
+      state.wires.forEach(w => {
+        adj[w.from].push({ to: w.to, type: 'wire' });
+        adj[w.to].push({ to: w.from, type: 'wire' });
+      });
+
+      // 2. Add fixed internal PCB traces
+      const pcbTraces = [
+        ['supply_neg_1', 'supply_neg_2'],
+        ['supply_neg_2', 'gnd_1'],
+        ['gnd_1', 'gnd_2'],
+        ['supply_pos_1', 'supply_pos_2'],
+        ['rs_right', 'am_sym_pos'],
+        ['am_sym_neg', 'diodes_l'],
+        ['vm_sym_neg', 'diodes_l'],
+        ['vm_sym_pos', 'diodes_r'],
+        ['diodes_r', 'gnd_1']
+      ];
+      pcbTraces.forEach(([n1, n2]) => {
+        adj[n1].push({ to: n2, type: 'trace' });
+        adj[n2].push({ to: n1, type: 'trace' });
+      });
+
+      // 3. Add components as internal graph edges
+      // Resistor RS
+      adj['rs_left'].push({ to: 'rs_right', type: 'rs' });
+      adj['rs_right'].push({ to: 'rs_left', type: 'rs' });
+
+      // Diodes internal links
+      adj['si_anode'].push({ to: 'si_cathode', type: 'si_diode' });
+      adj['si_cathode'].push({ to: 'si_anode', type: 'si_diode' });
+
+      adj['ge_anode'].push({ to: 'ge_cathode', type: 'ge_diode' });
+      adj['ge_cathode'].push({ to: 'ge_anode', type: 'ge_diode' });
+
+      // DPM internal links
+      adj['dpm_am_pos'].push({ to: 'dpm_am_neg', type: 'am_dpm' });
+      adj['dpm_am_neg'].push({ to: 'dpm_am_pos', type: 'am_dpm' });
+
+      // 4. Find all simple paths from supply_pos_1 to GND using DFS
+      const paths = [];
+      const destNodes = ['supply_neg_1', 'supply_neg_2', 'gnd_1', 'gnd_2'];
+      
+      function dfs(curr, visited, pathEdges, pathNodes) {
+        visited[curr] = true;
+        pathNodes.push(curr);
+
+        if (destNodes.includes(curr)) {
+          paths.push({ edges: [...pathEdges], nodes: [...pathNodes] });
+        } else {
+          for (let edge of adj[curr]) {
+            if (!visited[edge.to]) {
+              pathEdges.push(edge.type);
+              dfs(edge.to, visited, pathEdges, pathNodes);
+              pathEdges.pop();
+            }
+          }
+        }
+
+        pathNodes.pop();
+        visited[curr] = false;
+      }
+
+      const visited = {};
+      terminalsList.forEach(t => visited[t] = false);
+      dfs('supply_pos_1', visited, [], []);
+
+      // 5. Inspect paths for series elements
+      let validPath = null;
+      let detectedDiode = null;
+      let detectedBias = null;
+
+      for (let p of paths) {
+        const hasRS = p.edges.includes('rs');
+        const hasAmDPM = p.edges.includes('am_dpm');
+        
+        let hasSi = false;
+        let siForward = false;
+        let siReverse = false;
+        
+        let hasGe = false;
+        let geForward = false;
+        let geReverse = false;
+
+        for (let i = 0; i < p.nodes.length - 1; i++) {
+          const n1 = p.nodes[i];
+          const n2 = p.nodes[i+1];
+          
+          if ((n1 === 'si_anode' && n2 === 'si_cathode') || (n1 === 'si_cathode' && n2 === 'si_anode')) {
+            hasSi = true;
+            if (n1 === 'si_anode') siForward = true;
+            else siReverse = true;
+          }
+          if ((n1 === 'ge_anode' && n2 === 'ge_cathode') || (n1 === 'ge_cathode' && n2 === 'ge_anode')) {
+            hasGe = true;
+            if (n1 === 'ge_anode') geForward = true;
+            else geReverse = true;
+          }
+        }
+
+        if (hasRS && hasAmDPM && (hasSi || hasGe)) {
+          validPath = p;
+          detectedDiode = hasSi ? 'Si' : 'Ge';
+          detectedBias = hasSi 
+            ? (siForward ? 'forward' : 'reverse') 
+            : (geForward ? 'forward' : 'reverse');
+          break;
+        }
+      }
+
+      // Check Voltmeter connection
+      let isVoltmeterConnected = false;
+      let voltmeterPolarity = 1.0;
+
+      if (areConnectedUserWires('dpm_vm_pos', 'vm_sym_pos') && areConnectedUserWires('dpm_vm_neg', 'vm_sym_neg')) {
+        isVoltmeterConnected = true;
+        voltmeterPolarity = 1.0;
+      } else if (areConnectedUserWires('dpm_vm_pos', 'vm_sym_neg') && areConnectedUserWires('dpm_vm_neg', 'vm_sym_pos')) {
+        isVoltmeterConnected = true;
+        voltmeterPolarity = -1.0;
+      }
+
+      return {
+        isConnected: !!validPath,
+        isVoltmeterConnected: isVoltmeterConnected,
+        voltmeterPolarity: voltmeterPolarity,
+        diodeType: detectedDiode,
+        biasMode: detectedBias,
+        path: validPath
+      };
+    }
+
+    function runCircuitAnalysis() {
+      const result = checkCircuitState();
+      
+      state.circuitConnected = result.isConnected;
+      state.voltmeterConnected = result.isVoltmeterConnected;
+      state.voltmeterPolarity = result.voltmeterPolarity;
+      state.diodeType = result.diodeType;
+      state.biasMode = result.biasMode;
+
+      // Update sidebar status panel checklists
+      updateChecklists(result);
+
+      // Update badge states
+      const badgeDiode = document.getElementById('badge-diode');
+      const badgeBias = document.getElementById('badge-bias');
+      const sumDiode = document.getElementById('summary-diode');
+
+      if (state.circuitConnected) {
+        const textD = state.diodeType === 'Si' ? 'IN4007 Silicon' : 'OA79 Germanium';
+        badgeDiode.innerText = textD;
+        badgeDiode.className = `badge ${state.diodeType === 'Si' ? 'active-si' : 'active-ge'}`;
+        
+        const textB = state.biasMode === 'forward' ? 'Forward Bias' : 'Reverse Bias';
+        badgeBias.innerText = textB;
+        badgeBias.className = `badge active-mode`;
+        
+        sumDiode.innerText = `${textD} (${textB})`;
+        document.getElementById('res-diode').innerText = `${textD} (${textB})`;
+        document.getElementById('res-diode').style.color = state.diodeType === 'Si' ? '#f87171' : '#22d3ee';
+        sumDiode.style.color = state.diodeType === 'Si' ? '#f87171' : '#22d3ee';
+      } else {
+        badgeDiode.innerText = 'UNWIRED';
+        badgeDiode.className = 'badge';
+        badgeBias.innerText = 'UNWIRED';
+        badgeBias.className = 'badge';
+        sumDiode.innerText = 'NONE (UNWIRED)';
+        document.getElementById('res-diode').innerText = 'NONE (UNWIRED)';
+        document.getElementById('res-diode').style.color = 'var(--text-muted)';
+        sumDiode.style.color = 'var(--text-muted)';
+      }
+
+      // Enable/Disable logs
+      document.getElementById('btn-record').disabled = !state.powerOn || !state.circuitConnected;
+      document.getElementById('btn-autofill').disabled = !state.powerOn || !state.circuitConnected;
+      document.getElementById('btn-sweep').disabled = !state.powerOn || !state.circuitConnected;
+
+      runSimulationUpdate();
+    }
+
+    function updateChecklists(result) {
+      // 1. Supply -> RS In
+      const hasSupply = areConnectedUserWires('supply_pos_1', 'rs_left') || areConnectedUserWires('supply_pos_2', 'rs_left');
+      setChecklistItem('chk-supply', hasSupply);
+
+      // 2. Ammeter -> DPM Ammeter
+      const hasAm = areConnectedUserWires('am_sym_pos', 'dpm_am_pos') && areConnectedUserWires('am_sym_neg', 'dpm_am_neg');
+      setChecklistItem('chk-ammeter', hasAm);
+
+      // 3. Diode Patched
+      const hasDiode = result.diodeType !== null;
+      setChecklistItem('chk-diode', hasDiode);
+
+      // 4. Voltmeter -> DPM Voltmeter
+      const hasVm = result.isVoltmeterConnected;
+      setChecklistItem('chk-voltmeter', hasVm);
+    }
+
+    function setChecklistItem(id, isDone) {
+      const icon = document.getElementById(`${id}-icon`);
+      const text = document.getElementById(`${id}-text`);
+      if (isDone) {
+        icon.innerText = '✓';
+        icon.className = 'chk-icon done';
+        text.className = 'chk-text active';
+      } else {
+        icon.innerText = '⛌';
+        icon.className = 'chk-icon fail';
+        text.className = 'chk-text';
+      }
+    }
+
+    // ==========================================
+    // MATH SOLVER (Newton-Raphson Shockley Solver)
+    // ==========================================
+    function solveDiode(Vs, Is, n, Vt, Rs) {
+      let Vd;
+      if (Vs > 0) {
+        const maxCurrentGuess = Vs / Rs;
+        Vd = n * Vt * Math.log((maxCurrentGuess / Is) + 1);
+        if (isNaN(Vd) || Vd <= 0) Vd = 0.5;
+      } else {
+        Vd = Vs;
+      }
+      
+      const maxIter = 120;
+      const tolerance = 1e-11;
+      let iter = 0;
+      let converged = false;
+
+      for (let i = 0; i < maxIter; i++) {
+        iter++;
+        
+        const expArg = Vd / (n * Vt);
+        let expTerm;
+        if (expArg > 700) expTerm = Math.exp(700);
+        else if (expArg < -700) expTerm = 0;
+        else expTerm = Math.exp(expArg);
+
+        const f = Vs - Vd - Is * Rs * (expTerm - 1);
+        const df = -1 - (Is * Rs / (n * Vt)) * expTerm;
+        const delta = f / df;
+        let Vd_next = Vd - delta;
+        
+        if (Vs > 0) {
+          Vd_next = Math.max(0, Math.min(Vs, Vd_next));
+        } else {
+          Vd_next = Math.max(Vs, Math.min(0, Vd_next));
+        }
+
+        if (Math.abs(Vd_next - Vd) < tolerance) {
+          Vd = Vd_next;
+          converged = true;
+          break;
+        }
+        Vd = Vd_next;
+      }
+      
+      const expArg = Vd / (n * Vt);
+      const expTerm = (expArg < -700) ? 0 : (expArg > 700 ? Math.exp(700) : Math.exp(expArg));
+      const Id = Is * (expTerm - 1);
+      
+      return {
+        Vd: Vd,
+        Id: Id,
+        converged: converged,
+        iterations: iter
+      };
+    }
+
+    function calculateCircuitState() {
+      if (!state.powerOn || !state.circuitConnected) {
+        state.vd = 0;
+        state.id = 0;
+        state.converged = true;
+        return;
+      }
+
+      const diodeParams = PHYSICS[state.diodeType];
+      let Vs_eff = state.vSupply;
+      if (state.biasMode === 'reverse') {
+        Vs_eff = -state.vSupply;
+      }
+
+      const result = solveDiode(Vs_eff, diodeParams.Is, diodeParams.n, diodeParams.Vt, state.rs);
+      
+      state.vd = result.Vd;
+      state.id = result.Id;
+      state.converged = result.converged;
+
+      const solverBadge = document.getElementById('badge-solver');
+      if (state.converged) {
+        solverBadge.innerText = `NR-Solver: OK (${result.iterations} iter)`;
+        solverBadge.style.color = '#34d399';
+        solverBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+      } else {
+        solverBadge.innerText = `Solver Error`;
+        solverBadge.style.color = '#f87171';
+        solverBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+      }
+    }
+
+
+
+    function setVoltmeterRange(range) {
+      state.voltmeterRange = range;
+      document.getElementById('btn-vrange-mv').classList.toggle('active-fwd', range === '2000mV');
+      document.getElementById('btn-vrange-v').classList.toggle('active-fwd', range === '20V');
+      document.getElementById('voltmeter-range-text').innerText = `Range: ${range === '2000mV' ? '2000 mV' : '20 V'}`;
+      document.getElementById('voltmeter-unit-label').innerText = range === '2000mV' ? 'mV' : 'V';
+      // Rotate range switch lever vertically
+      const lever = document.getElementById('vm-range-switch-lever');
+      if (lever) {
+        lever.setAttribute('transform', range === '2000mV' ? 'rotate(0)' : 'rotate(180)');
+      }
+      updateMeters();
+    }
+
+    function setAmmeterRange(range) {
+      state.ammeterRange = range;
+      document.getElementById('btn-arange-ua').classList.toggle('active-fwd', range === '20000uA');
+      document.getElementById('btn-arange-ma').classList.toggle('active-fwd', range === '200mA');
+      document.getElementById('ammeter-range-text').innerText = `Range: ${range === '20000uA' ? '20000 µA' : '200 mA'}`;
+      document.getElementById('ammeter-unit-label').innerText = range === '20000uA' ? 'µA' : 'mA';
+      // Rotate range switch lever vertically
+      const lever = document.getElementById('am-range-switch-lever');
+      if (lever) {
+        lever.setAttribute('transform', range === '20000uA' ? 'rotate(0)' : 'rotate(180)');
+      }
+      updateMeters();
+    }
+
+    function updateSupplyFromSlider() {
+      const slider = document.getElementById('supply-slider');
+      state.vSupply = parseFloat(slider.value);
+      document.getElementById('supply-num').value = state.vSupply.toFixed(1);
+      document.getElementById('supply-val-text').innerText = `${state.vSupply.toFixed(1)} V`;
+
+      if (state.powerOn) {
+        const angle = (state.vSupply / 10.0) * 270;
+        document.getElementById('supply-knob-indicator').setAttribute('transform', `rotate(${angle})`);
+      }
+
+      runSimulationUpdate();
+    }
+
+    function updateSupplyFromNum() {
+      const num = document.getElementById('supply-num');
+      let val = parseFloat(num.value);
+      if (isNaN(val)) val = 0.0;
+      val = Math.max(0.0, Math.min(10.0, val));
+      
+      state.vSupply = val;
+      num.value = val.toFixed(1);
+      document.getElementById('supply-slider').value = val;
+      document.getElementById('supply-val-text').innerText = `${val.toFixed(1)} V`;
+
+      if (state.powerOn) {
+        const angle = (state.vSupply / 10.0) * 270;
+        document.getElementById('supply-knob-indicator').setAttribute('transform', `rotate(${angle})`);
+      }
+
+      runSimulationUpdate();
+    }
+
+    function runSimulationUpdate() {
+      calculateCircuitState();
+      updateMeters();
+      drawPCB();
+      drawGraph();
+    }
+
+    // ==========================================
+    // METERS DPM READINGS
+    // ==========================================
+    function updateMeters() {
+      const vDisplay = document.getElementById('voltmeter-val');
+      const aDisplay = document.getElementById('ammeter-val');
+
+      if (!state.powerOn) {
+        vDisplay.innerText = "----";
+        aDisplay.innerText = "----";
+        vDisplay.classList.remove('overflow-blink');
+        aDisplay.classList.remove('overflow-blink');
+        document.getElementById('summary-power').innerText = '-';
+        return;
+      }
+
+      // 1. VOLTMETER
+      vDisplay.classList.remove('overflow-blink');
+      if (!state.voltmeterConnected) {
+        vDisplay.innerText = " 0.00"; // not connected reads 0
+      } else {
+        // Voltmeter reads across active diode
+        let V_meas = state.vd * state.voltmeterPolarity;
+        
+        if (state.voltmeterRange === '2000mV') {
+          const val_mv = V_meas * 1000;
+          if (Math.abs(V_meas) >= 2.0) {
+            vDisplay.innerText = "OL";
+            vDisplay.classList.add('overflow-blink');
+          } else {
+            vDisplay.innerText = val_mv.toFixed(1).padStart(6, ' ');
+          }
+        } else {
+          if (Math.abs(V_meas) >= 20.0) {
+            vDisplay.innerText = "OL";
+            vDisplay.classList.add('overflow-blink');
+          } else {
+            vDisplay.innerText = V_meas.toFixed(2).padStart(6, ' ');
+          }
+        }
+      }
+
+      // 2. AMMETER
+      aDisplay.classList.remove('overflow-blink');
+      let I_meas = Math.abs(state.id); // leakage magnitude in reverse
+
+      if (state.ammeterRange === '20000uA') {
+        const val_ua = I_meas * 1000000;
+        if (I_meas >= 0.02) {
+          aDisplay.innerText = "OL";
+          aDisplay.classList.add('overflow-blink');
+        } else {
+          aDisplay.innerText = val_ua.toFixed(1).padStart(6, ' ');
+        }
+      } else {
+        const val_ma = I_meas * 1000;
+        if (I_meas >= 0.2) {
+          aDisplay.innerText = "OL";
+          aDisplay.classList.add('overflow-blink');
+        } else {
+          aDisplay.innerText = val_ma.toFixed(2).padStart(6, ' ');
+        }
+      }
+
+      // 3. POWER SUMMARY
+      const p_mw = Math.abs(state.vd * state.id) * 1000;
+      document.getElementById('summary-power').innerText = `${p_mw.toFixed(3)} mW`;
+      const resPowerEl = document.getElementById('res-power');
+      if (resPowerEl) resPowerEl.innerText = `${p_mw.toFixed(3)} mW`;
+    }
+
+    // ==========================================
+    // CURRENT PARTICLE ANIMATION ON PCB
+    // ==========================================
+    function drawPCB() {
+      // In this analog mode, since current flows along arbitrary user patch wires,
+      // let's animate the particles directly on the drawn SVG wires!
+      // Wrap in requestAnimationFrame to decouple visual styling from layout cycles
+      requestAnimationFrame(() => {
+        const wires = document.querySelectorAll('.patch-wire');
+        
+        if (!state.powerOn || !state.circuitConnected || Math.abs(state.id) < 1e-12) {
+          wires.forEach(w => {
+            if (w.getAttribute('stroke-dasharray')) {
+              w.removeAttribute('stroke-dasharray');
+            }
+            if (w.getAttribute('stroke-dashoffset')) {
+              w.removeAttribute('stroke-dashoffset');
+            }
+            if (w.style.animation && w.style.animation !== 'none') {
+              w.style.animation = 'none';
+              delete w.dataset.animVal;
+            }
+          });
+          return;
+        }
+
+        // Configure current flow particles along patch cords
+        const currentAmp = Math.abs(state.id);
+        let duration = 2.0;
+        let expectedDash = '';
+        let expectedAnim = '';
+
+        if (state.biasMode === 'forward') {
+          duration = Math.max(0.1, 2.0 - (currentAmp * 200));
+          expectedDash = '8 25';
+          expectedAnim = `flow-current ${duration.toFixed(3)}s linear infinite`;
+        } else {
+          duration = 15.0; // very slow leakage
+          expectedDash = '5 40';
+          expectedAnim = `flow-current ${duration.toFixed(3)}s linear infinite`;
+        }
+
+        wires.forEach(w => {
+          if (w.getAttribute('stroke-dasharray') !== expectedDash) {
+            w.setAttribute('stroke-dasharray', expectedDash);
+          }
+          if (w.dataset.animVal !== expectedAnim) {
+            w.dataset.animVal = expectedAnim;
+            w.style.animation = expectedAnim;
+          }
+        });
+      });
+    }
+
+    // ==========================================
+    // CANVAS GRAPHING LIBRARY
+    // ==========================================
+    let canvas, ctx;
+    
+    function initGraph() {
+      canvas = document.getElementById('vi-graph');
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+    }
+
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth * window.devicePixelRatio;
+      canvas.height = container.clientHeight * window.devicePixelRatio;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      drawGraph();
+    }
+
+    function valToPixel(V, I, width, height) {
+      const marginX = 45;
+      const marginY = 35;
+      
+      const X0 = marginX + (width - 2 * marginX) * 0.4;
+      const Y0 = marginY + (height - 2 * marginY) * 0.5;
+
+      const maxV_fwd = graphLimits.maxV_fwd;
+      const maxV_rev = graphLimits.maxV_rev;
+      const maxI_fwd = graphLimits.maxI_fwd; 
+      const maxI_rev = graphLimits.maxI_rev; 
+
+      let x, y;
+
+      if (V >= 0) {
+        const wAvailable = width - marginX - X0;
+        x = X0 + (V / maxV_fwd) * wAvailable;
+      } else {
+        const wAvailable = X0 - marginX;
+        x = X0 + (V / maxV_rev) * -wAvailable; 
+      }
+
+      const I_mA = I * 1000;
+      const I_uA = I * 1000000;
+
+      if (I >= 0) {
+        const hAvailable = Y0 - marginY;
+        y = Y0 - (I_mA / maxI_fwd) * hAvailable;
+      } else {
+        const hAvailable = height - marginY - Y0;
+        y = Y0 - (I_uA / maxI_rev) * -hAvailable;
+      }
+
+      return { x, y };
+    }
+
+    function drawGraph() {
+      if (!ctx) return;
+      
+      const width = canvas.width / window.devicePixelRatio;
+      const height = canvas.height / window.devicePixelRatio;
+      
+      ctx.fillStyle = '#060611';
+      ctx.fillRect(0, 0, width, height);
+
+      const marginX = 45;
+      const marginY = 35;
+      const X0 = marginX + (width - 2 * marginX) * 0.4;
+      const Y0 = marginY + (height - 2 * marginY) * 0.5;
+
+      ctx.strokeStyle = '#151532';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#64748b';
+      ctx.font = '9px Orbitron, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      const maxV_fwd = graphLimits.maxV_fwd;
+      const fwdStep = maxV_fwd / 6;
+      for (let v = 0; v <= maxV_fwd + 0.01; v += fwdStep) {
+        const pt = valToPixel(v, 0, width, height);
+        ctx.beginPath();
+        ctx.moveTo(pt.x, marginY);
+        ctx.lineTo(pt.x, height - marginY);
+        ctx.stroke();
+        if (v > 0) {
+          ctx.fillText(v.toFixed(2) + 'V', pt.x, Y0 + 5);
+        }
+      }
+
+      const maxV_rev = graphLimits.maxV_rev;
+      const revStep = maxV_rev / 5;
+      for (let v = 0; v >= maxV_rev - 0.01; v += revStep) {
+        const pt = valToPixel(v, 0, width, height);
+        ctx.beginPath();
+        ctx.moveTo(pt.x, marginY);
+        ctx.lineTo(pt.x, height - marginY);
+        ctx.stroke();
+        if (v < 0) {
+          ctx.fillText(v.toFixed(1) + 'V', pt.x, Y0 + 5);
+        }
+      }
+
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      const maxI_fwd = graphLimits.maxI_fwd;
+      const fwdIStep = maxI_fwd / 5;
+      for (let i = 0; i <= maxI_fwd + 0.01; i += fwdIStep) {
+        const pt = valToPixel(0, i / 1000, width, height);
+        ctx.beginPath();
+        ctx.moveTo(marginX, pt.y);
+        ctx.lineTo(width - marginX, pt.y);
+        ctx.stroke();
+        if (i > 0) {
+          ctx.fillText(i.toFixed(1) + ' mA', X0 - 8, pt.y);
+        }
+      }
+
+      const maxI_rev = graphLimits.maxI_rev;
+      const revIStep = maxI_rev / 5;
+      for (let i = 0; i >= maxI_rev - 0.01; i += revIStep) {
+        const pt = valToPixel(0, i / 1000000, width, height);
+        ctx.beginPath();
+        ctx.moveTo(marginX, pt.y);
+        ctx.lineTo(width - marginX, pt.y);
+        ctx.stroke();
+        if (i < 0) {
+          ctx.fillText(i.toFixed(1) + ' µA', X0 - 8, pt.y);
+        }
+      }
+
+      ctx.textAlign = 'right';
+      ctx.fillText('0', X0 - 8, Y0 + 5);
+
+      ctx.strokeStyle = '#383863';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(marginX, Y0);
+      ctx.lineTo(width - marginX, Y0);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(X0, marginY);
+      ctx.lineTo(X0, height - marginY);
+      ctx.stroke();
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = '10px Orbitron, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('Diode Voltage Vd (V)', width - marginX, Y0 - 15);
+      ctx.textAlign = 'left';
+      ctx.fillText('Current Id (mA/µA)', X0 + 8, marginY - 10);
+
+      // Plot curves
+      if (state.compareOverlay) {
+        plotFullSweepLine('Si', '#ef4444', width, height);
+        plotFullSweepLine('Ge', '#06b6d4', width, height);
+      } else if (state.circuitConnected) {
+        const curveColor = state.diodeType === 'Si' ? '#ef4444' : '#06b6d4';
+        plotFullSweepLine(state.diodeType, curveColor, width, height);
+      }
+
+      // Show live marker point
+      if (state.powerOn && state.circuitConnected) {
+        const pt = valToPixel(state.vd, state.id, width, height);
+        
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#34d399';
+        
+        ctx.fillStyle = '#34d399';
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 6, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        ctx.shadowBlur = 0; 
+        
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        
+        ctx.beginPath();
+        ctx.moveTo(pt.x, Y0);
+        ctx.lineTo(pt.x, pt.y);
+        ctx.moveTo(X0, pt.y);
+        ctx.lineTo(pt.x, pt.y);
+        ctx.stroke();
+        ctx.setLineDash([]); 
+      }
+    }
+
+    function plotFullSweepLine(type, color, width, height) {
+      const params = PHYSICS[type];
+      
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+
+      let first = true;
+      for (let vs = 0; vs <= 10.0; vs += 0.05) {
+        const res = solveDiode(vs, params.Is, params.n, params.Vt, state.rs);
+        const pt = valToPixel(res.Vd, res.Id, width, height);
+        if (first) {
+          ctx.moveTo(pt.x, pt.y);
+          first = false;
+        } else {
+          ctx.lineTo(pt.x, pt.y);
+        }
+      }
+
+      for (let vs = 0; vs >= -10.0; vs -= 0.1) {
+        const res = solveDiode(vs, params.Is, params.n, params.Vt, state.rs);
+        const pt = valToPixel(res.Vd, res.Id, width, height);
+        ctx.lineTo(pt.x, pt.y);
+      }
+
+      ctx.stroke();
+    }
+
+    function zoomGraph(factor) {
+      state.zoomLevel *= factor;
+      state.zoomLevel = Math.max(0.25, Math.min(4.0, state.zoomLevel));
+
+      graphLimits.maxV_fwd = 1.2 * state.zoomLevel;
+      graphLimits.maxV_rev = -10.0 * state.zoomLevel;
+      graphLimits.maxI_fwd = 15.0 * state.zoomLevel;
+      graphLimits.maxI_rev = -50.0 * state.zoomLevel;
+
+      drawGraph();
+      showToast(`Graph Zoom: x${(1/state.zoomLevel).toFixed(2)}`, "info");
+    }
+
+    function resetZoom() {
+      state.zoomLevel = 1.0;
+      graphLimits.maxV_fwd = 1.2;
+      graphLimits.maxV_rev = -10.0;
+      graphLimits.maxI_fwd = 15.0;
+      graphLimits.maxI_rev = -50.0;
+      drawGraph();
+    }
+
+    function toggleOverlayCompare() {
+      state.compareOverlay = !state.compareOverlay;
+      document.getElementById('btn-overlay').classList.toggle('active-fwd', state.compareOverlay);
+      drawGraph();
+      showToast(state.compareOverlay ? "Comparison mode ENABLED (Si vs Ge)" : "Comparison mode DISABLED", "info");
+    }
+
+    // ==========================================
+    // OSCILLOSCOPE SWEEP ANIMATION
+    // ==========================================
+    let sweepInterval = null;
+    function triggerSweepAnimation() {
+      if (!state.powerOn || !state.circuitConnected) {
+        showToast("Please wire the circuit and turn power ON first!", "error");
+        return;
+      }
+      if (sweepInterval) clearInterval(sweepInterval);
+
+      showToast("Triggering oscilloscope trace sweep...", "info");
+      
+      let sweepVolts = 0.0;
+      const oldSupply = state.vSupply;
+
+      document.getElementById('btn-sweep').disabled = true;
+
+      sweepInterval = setInterval(() => {
+        sweepVolts += 0.2;
+        if (sweepVolts > 10.0) {
+          clearInterval(sweepInterval);
+          state.vSupply = oldSupply;
+          document.getElementById('supply-slider').value = oldSupply;
+          document.getElementById('supply-num').value = oldSupply.toFixed(1);
+          document.getElementById('supply-val-text').innerText = `${oldSupply.toFixed(1)} V`;
+          
+          runSimulationUpdate();
+          document.getElementById('btn-sweep').disabled = false;
+          showToast("Oscilloscope sweep complete.", "warning");
+        } else {
+          state.vSupply = sweepVolts;
+          document.getElementById('supply-slider').value = sweepVolts;
+          document.getElementById('supply-num').value = sweepVolts.toFixed(1);
+          document.getElementById('supply-val-text').innerText = `${sweepVolts.toFixed(1)} V`;
+
+          const angle = (state.vSupply / 10.0) * 270;
+          document.getElementById('supply-knob-indicator').setAttribute('transform', `rotate(${angle})`);
+
+          calculateCircuitState();
+          updateMeters();
+          drawPCB();
+          drawGraph();
+        }
+      }, 30);
+    }
+
+    // ==========================================
+    // OBSERVATION TABLE LOGISTICS
+    // ==========================================
+    function recordReading() {
+      if (!state.powerOn || !state.circuitConnected) return;
+
+      const currentDiode = PHYSICS[state.diodeType];
+      const V_supply = state.vSupply;
+      const V_diode = state.vd;
+      const I_diode = state.id;
+      const Power = V_diode * I_diode;
+
+      const record = {
+        sNo: state.tableData.length + 1,
+        type: state.diodeType,
+        bias: state.biasMode,
+        vSupply: V_supply,
+        vDiode: V_diode,
+        iDiode: I_diode,
+        power: Power
+      };
+
+      state.tableData.push(record);
+      renderTable();
+      calculateDerivedKnee();
+      showToast(`Logged reading #${record.sNo}: Vs = ${V_supply.toFixed(1)}V`, "info");
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      const btnExport = document.getElementById('btn-export');
+      
+      if (state.tableData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-table-msg">No readings recorded yet. Setup wiring, set bench power to ON, adjust voltage, and click 'Log Data'.</td>
+          </tr>`;
+        btnExport.disabled = true;
+        return;
+      }
+
+      btnExport.disabled = false;
+      tbody.innerHTML = '';
+
+      state.tableData.forEach((row) => {
+        const tr = document.createElement('tr');
+        
+        const vDisplay = row.vDiode.toFixed(4) + ' V';
+          
+        const iDisplay = row.bias === 'forward'
+          ? (row.iDiode * 1000).toFixed(3) + ' mA'
+          : (row.iDiode * 1000000).toFixed(2) + ' µA';
+
+        const pDisplay = (row.power * 1000).toFixed(4) + ' mW';
+        const remarks = row.bias === 'forward'
+          ? (row.vDiode > PHYSICS[row.type].knee ? "Conduction" : "Cut-in")
+          : "Leakage";
+
+        tr.innerHTML = `
+          <td>${row.sNo}</td>
+          <td>${row.vSupply.toFixed(1)} V</td>
+          <td>${vDisplay}</td>
+          <td>${iDisplay}</td>
+          <td>${pDisplay}</td>
+          <td style="color: ${row.bias === 'forward' ? 'var(--accent-fwd)' : 'var(--accent-rev)'}; font-family: var(--font-main); font-weight: 600; font-size: 0.75rem;">${remarks} (${row.type})</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearTable() {
+      state.tableData = [];
+      renderTable();
+      document.getElementById('summary-knee').innerText = '-';
+        const resKneeEl = document.getElementById('res-knee');
+        if (resKneeEl) resKneeEl.innerText = '-';
+      showToast("Observation table cleared.", "warning");
+    }
+
+    function autoFillTable() {
+      if (!state.powerOn || !state.circuitConnected) {
+        showToast("Please wire the circuit and turn power ON first!", "error");
+        return;
+      }
+
+      clearTable();
+      showToast("Auto-logging sweep started...", "info");
+
+      let sweepVolts = 0.0;
+      const interval = setInterval(() => {
+        state.vSupply = sweepVolts;
+        document.getElementById('supply-slider').value = sweepVolts;
+        document.getElementById('supply-num').value = sweepVolts.toFixed(1);
+        document.getElementById('supply-val-text').innerText = `${sweepVolts.toFixed(1)} V`;
+
+        const angle = (state.vSupply / 10.0) * 270;
+        document.getElementById('supply-knob-indicator').setAttribute('transform', `rotate(${angle})`);
+
+        calculateCircuitState();
+        recordReading();
+
+        sweepVolts += 1.0;
+        if (sweepVolts > 10.0) {
+          clearInterval(interval);
+          showToast("Auto-logging sweep completed.", "warning");
+        }
+      }, 150);
+    }
+
+    function calculateDerivedKnee() {
+      if (!state.diodeType) return;
+      const activeDiode = state.diodeType;
+
+      const fwdPoints = state.tableData.filter(pt => pt.type === activeDiode && pt.bias === 'forward');
+      
+      if (fwdPoints.length < 3) {
+        document.getElementById('summary-knee').innerText = '-';
+        const resKneeEl = document.getElementById('res-knee');
+        if (resKneeEl) resKneeEl.innerText = '-';
+        return;
+      }
+
+      fwdPoints.sort((a, b) => a.vDiode - b.vDiode);
+
+      let maxSlope = 0;
+      let kneeVoltage = PHYSICS[activeDiode].knee; 
+
+      for (let i = 1; i < fwdPoints.length; i++) {
+        const dV = fwdPoints[i].vDiode - fwdPoints[i-1].vDiode;
+        const dI = fwdPoints[i].iDiode - fwdPoints[i-1].iDiode; 
+        if (dV > 1e-3) {
+          const slope = dI / dV;
+          if (slope > maxSlope) {
+            maxSlope = slope;
+            const pt = fwdPoints[i];
+            const derived = pt.vDiode - pt.iDiode / slope;
+            if (derived > 0.1 && derived < 1.1) {
+              kneeVoltage = derived;
+            }
+          }
+        }
+      }
+
+      document.getElementById('summary-knee').innerText = `${kneeVoltage.toFixed(3)} V`;
+      const resKneeEl = document.getElementById('res-knee');
+      if (resKneeEl) resKneeEl.innerText = `${kneeVoltage.toFixed(3)} V`;
+    }
+
+    function exportCSV() {
+      if (state.tableData.length === 0) return;
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "S.No,Supply Voltage (V),Diode Voltage Vd (V),Diode Current Id (A),Power Dissipation (W),Bias,Diode Material\r\n";
+
+      state.tableData.forEach((row) => {
+        csvContent += `${row.sNo},${row.vSupply},${row.vDiode},${row.iDiode},${row.power},${row.bias},${row.type}\r\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `diode_experiment_data_${state.diodeType || 'unknown'}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("CSV data exported successfully.", "info");
+    }
+
+    // ==========================================
+    // STEP-BY-STEP PROCEDURE GUIDE LOGIC
+    // ==========================================
+    function selectStep(stepNum) {
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`proc-step-${i}`).classList.remove('active-step');
+      }
+
+      document.getElementById(`proc-step-${stepNum}`).classList.add('active-step');
+      state.activeStep = stepNum;
+
+      // Clear previous socket highlights
+      document.querySelectorAll('.terminal-socket circle.outer-ring').forEach(c => {
+        c.classList.remove('svg-highlight-socket');
+      });
+
+      const highlight = (ids) => {
+        ids.forEach(id => {
+          const g = document.getElementById(`socket-${id}`);
+          if (g) {
+            g.querySelector('circle.outer-ring').classList.add('svg-highlight-socket');
+          }
+        });
+      };
+
+      switch (stepNum) {
+        case 1: // Supply -> RS
+          highlight(['supply_pos_1', 'supply_pos_2', 'rs_left']);
+          break;
+        case 2: // Ammeter -> DPM
+          highlight(['am_sym_pos', 'am_sym_neg', 'dpm_am_pos', 'dpm_am_neg']);
+          break;
+        case 3: // Patch Diode (IN4007)
+          highlight(['diodes_l', 'diodes_r', 'si_anode', 'si_cathode']);
+          break;
+        case 4: // Voltmeter -> DPM
+          highlight(['vm_sym_pos', 'vm_sym_neg', 'dpm_vm_pos', 'dpm_vm_neg']);
+          break;
+        case 5: // Power ON & knobs
+          highlight(['supply_pos_1', 'supply_pos_2']);
+          break;
+      }
+    }
+
+    // ==========================================
+    // MODAL DRAWER PANELS
+    // ==========================================
+    function toggleTheory() {
+      const overlay = document.getElementById('theory-overlay');
+      const drawer = document.getElementById('theory-drawer');
+      const isOpen = drawer.classList.contains('active');
+
+      if (isOpen) {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+      } else {
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+        document.getElementById('procedure-drawer').classList.remove('active');
+        document.getElementById('procedure-overlay').classList.remove('active');
+      }
+    }
+
+    function toggleProcedure() {
+      const overlay = document.getElementById('procedure-overlay');
+      const drawer = document.getElementById('procedure-drawer');
+      const isOpen = drawer.classList.contains('active');
+
+      if (isOpen) {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+      } else {
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+        document.getElementById('theory-drawer').classList.remove('active');
+        document.getElementById('theory-overlay').classList.remove('active');
+      }
+    }
+
+    // ==========================================
+    // TOAST NOTIFICATIONS
+    // ==========================================
+    function showToast(message, type = 'info') {
+      const toastBox = document.getElementById('toast-box');
+      const toast = document.createElement('div');
+      
+      toast.className = `toast toast-${type}`;
+      toast.innerText = message;
+      
+      toastBox.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slide-in 0.3s ease reverse forwards';
+        setTimeout(() => {
+          if (toastBox.contains(toast)) {
+            toastBox.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+    }
+
+    // ==========================================
+    // RESET ALL VARIABLES
+    // ==========================================
+    function resetAll() {
+      state.powerOn = true;
+      state.vSupply = 0.0;
+      state.voltmeterRange = '20V';
+      state.ammeterRange = '200mA';
+      state.tableData = [];
+      state.compareOverlay = false;
+      state.zoomLevel = 1.0;
+
+      document.getElementById('supply-slider').value = 0.0;
+      document.getElementById('supply-num').value = 0.0;
+      document.getElementById('supply-val-text').innerText = '0.0 V';
+
+      document.getElementById('supply-knob-indicator').setAttribute('transform', 'rotate(0)');
+
+      const board = document.getElementById('pcb-board-element');
+      board.classList.add('power-on');
+
+      const statusText = document.getElementById('board-status-text');
+      statusText.innerText = 'ENERGIZED';
+      statusText.style.color = 'var(--accent-fwd)';
+
+      setVoltmeterRange('20V');
+      setAmmeterRange('200mA');
+      clearWires();
+      clearTable();
+      resetZoom();
+      runCircuitAnalysis();
+      selectStep(1);
+
+      document.getElementById('res-diode').innerText = '-';
+      document.getElementById('res-knee').innerText = '-';
+      document.getElementById('res-power').innerText = '-';
+      showToast("Laboratory kit reset to defaults.", "info");
+    }
+
+    // ==========================================
+    // TAB NAVIGATION
+    // ==========================================
+    function switchMainTab(tabId) {
+      // Hide all tab content
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.style.display = 'none';
+        el.classList.remove('active-content');
+      });
+      // Show selected tab content
+      const activeTabEl = document.getElementById('tab-' + tabId);
+      if (activeTabEl) {
+        if (tabId === 'simulation') {
+          activeTabEl.style.display = 'grid';
+        } else if (tabId === 'observation') {
+          activeTabEl.style.display = 'grid';
+        } else {
+          activeTabEl.style.display = 'block';
+        }
+        activeTabEl.classList.add('active-content');
+      }
+
+      // Update active tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active-tab');
+      });
+      
+      // Highlight correct tab button
+      if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.classList.add('active-tab');
+      } else {
+        const buttons = document.querySelectorAll('.tab-btn');
+        const tabList = ['aim', 'apparatus', 'formulas', 'procedure', 'circuit', 'simulation', 'observation', 'result'];
+        const idx = tabList.indexOf(tabId);
+        if (idx !== -1 && buttons[idx]) {
+          buttons[idx].classList.add('active-tab');
+        }
+      }
+
+      // Resize canvas to repaint the graph at its new size
+      if (tabId === 'observation') {
+        setTimeout(resizeCanvas, 50);
+      }
+    }
+  </script>
+</body>
+</html>

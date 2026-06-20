@@ -1,0 +1,2568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Superposition Theorem - Virtual BEE Lab</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & UTILITIES
+       ========================================================================== */
+    :root {
+      --bg-main: #060814;
+      --bg-panel: #0d1222;
+      --bg-panel-header: #141b30;
+      --border-color: #202b4d;
+      
+      --pcb-green: #0a542b;
+      --pcb-green-light: #127a41;
+      --pcb-gold: #d4af37;
+      --pcb-silk: #ffffff;
+      
+      --text-main: #e2e8f0;
+      --text-muted: #8892b0;
+      
+      --color-v1: #00f0ff;
+      --color-v2: #ff9f1c;
+      --color-both: #00ff66;
+      --color-error: #ff3b30;
+      --color-purple: #a855f7;
+      
+      --led-glow: rgba(255, 59, 48, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      padding-bottom: 2rem;
+    }
+
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+    }
+
+    /* Reference Design: Top Title Bar */
+    .top-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #0b0d19;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.35rem 0.9rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #4b5563;
+    }
+
+    .title-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .sub-category {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* Reference Design: Top Tab Navigation */
+    .nav-tabs {
+      display: flex;
+      background-color: #0d1222;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .tab-link {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.8rem 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      border-bottom: 3px solid transparent;
+    }
+    .tab-link:hover {
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    .tab-link.active {
+      color: var(--color-v1);
+      border-bottom-color: var(--color-v1);
+      background-color: rgba(0, 240, 255, 0.03);
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    /* Tab Content Layout */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Static Text Section Styles */
+    .text-layout {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .text-layout h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      font-size: 1.2rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .text-layout p, .text-layout li {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 0.75rem;
+    }
+    .text-layout ul, .text-layout ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .text-layout strong {
+      color: var(--color-v1);
+    }
+
+    /* Panel Card */
+    .panel {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      background-color: var(--bg-panel-header);
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .panel-body {
+      padding: 1rem;
+    }
+
+    /* 2-Column Simulation Grid */
+    .simulation-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1000px) {
+      .simulation-grid {
+        grid-template-columns: 1fr;
+      }
+      .controls-sidebar {
+        grid-column: span 1;
+      }
+    }
+
+    /* Bench View containing the Analog Trainer Kit */
+    .bench-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #04060d;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    /* Analog Trainer Bezel */
+    .trainer-bezel {
+      background: #e2e8f0;
+      border: 6px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+      width: 100%;
+    }
+
+    /* Green PCB Board Faceplate */
+    .trainer-faceplate {
+      background: linear-gradient(135deg, var(--pcb-green), var(--pcb-green-light));
+      border: 4px solid #1e293b;
+      border-radius: 8px;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 2.0;
+    }
+
+    /* SVG Circuit Board */
+    .faceplate-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Voltmeter / Ammeter LED Readouts */
+    .led-display-panel {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      color: #ff3b30;
+      text-shadow: 0 0 12px var(--led-glow);
+      user-select: none;
+    }
+
+    .led-inactive {
+      opacity: 0.06 !important;
+      text-shadow: none !important;
+    }
+
+    /* Binding Post Terminals */
+    .binding-post {
+      cursor: pointer;
+      transition: filter 0.2s ease;
+    }
+    .binding-post:hover {
+      filter: brightness(1.2) drop-shadow(0 0 6px rgba(255,255,255,0.4));
+    }
+    .binding-post.selected {
+      filter: brightness(1.4) drop-shadow(0 0 8px #00ff66);
+    }
+
+    /* Rotary Knob drag action styling */
+    .rotary-knob:active {
+      cursor: grabbing;
+    }
+
+    /* Patch Cord Wires */
+    .patch-cord {
+      fill: none;
+      stroke-linecap: round;
+      cursor: pointer;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+      transition: stroke-width 0.2s ease;
+    }
+    .patch-cord:hover {
+      stroke-width: 8px !important;
+    }
+
+    /* Reference Design: Middle Schematic Panel Viewport */
+    .schematic-viewport {
+      background-color: #04060d;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    .incomplete-alert {
+      text-align: center;
+      color: var(--color-error);
+      font-family: 'Orbitron', sans-serif;
+      animation: alertPulse 2s infinite ease-in-out;
+    }
+    @keyframes alertPulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .incomplete-alert i {
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+      filter: drop-shadow(0 0 10px rgba(255, 59, 48, 0.4));
+    }
+
+    .incomplete-alert p {
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Reference Design: Sidebar Sliders & Controls */
+    .slider-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.78rem;
+    }
+
+    .slider-title {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .slider-value {
+      color: var(--color-v1);
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+    }
+
+    .custom-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #141622;
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .custom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-v1);
+      box-shadow: 0 0 8px var(--color-v1);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .custom-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    .sidebar-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+
+    /* General Button Styles */
+    .btn {
+      background: rgba(20, 22, 34, 0.6);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.55rem 1rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #4b5563;
+      color: #fff;
+    }
+    .btn-record {
+      background-color: rgba(0, 255, 102, 0.05);
+      border-color: #00ff66;
+      color: #00ff66;
+    }
+    .btn-record:hover {
+      background-color: rgba(0, 255, 102, 0.15) !important;
+      border-color: #00ff66 !important;
+      color: #00ff66 !important;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+    }
+    .btn-theory {
+      background-color: rgba(168, 85, 247, 0.05);
+      border-color: var(--color-purple);
+      color: var(--color-purple);
+    }
+    .btn-theory:hover {
+      background-color: rgba(168, 85, 247, 0.15) !important;
+      border-color: var(--color-purple) !important;
+      color: var(--color-purple) !important;
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+    }
+    .btn-auto {
+      background-color: rgba(0, 240, 255, 0.05);
+      border-color: var(--color-v1);
+      color: var(--color-v1);
+    }
+    .btn-auto:hover {
+      background-color: rgba(0, 240, 255, 0.15) !important;
+      border-color: var(--color-v1) !important;
+      color: var(--color-v1) !important;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    /* Reference Design: Bottom Key Parameters Panel */
+    .key-params-panel {
+      background-color: #0d1222;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .key-params-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .param-card {
+      background: rgba(4, 6, 13, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem 0.8rem;
+    }
+
+    .param-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .param-value {
+      font-family: 'Fira Code', monospace;
+      font-size: 1.05rem;
+      font-weight: bold;
+    }
+
+    .operating-point-row {
+      background-color: rgba(4, 6, 13, 0.6);
+      border: 1px solid var(--border-color);
+      padding: 0.45rem 1rem;
+      border-radius: 4px;
+      font-size: 0.76rem;
+      font-family: 'Fira Code', monospace;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Table styles */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    /* Glow utilities */
+    .glow-cyan { filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.8)); }
+    .glow-orange { filter: drop-shadow(0 0 4px rgba(255, 159, 28, 0.8)); }
+    .glow-green { filter: drop-shadow(0 0 4px rgba(0, 255, 102, 0.8)); }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- TOP HEADER TITLE BAR -->
+    <div class="top-title-bar">
+      <button class="back-btn" onclick="switchTab('simulation')"><i class="fa-solid fa-arrow-left" style="margin-right: 4px;"></i> Reset View</button>
+      <div class="title-text">Superposition Theorem Trainer Kit</div>
+      <div class="sub-category">Basic Electrical Engineering Lab</div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+      <button class="tab-link" id="tabBtn_aim" onclick="switchTab('aim')">Aim</button>
+      <button class="tab-link" id="tabBtn_apparatus" onclick="switchTab('apparatus')">Apparatus</button>
+      <button class="tab-link" id="tabBtn_procedure" onclick="switchTab('procedure')">Procedure</button>
+      <button class="tab-link" id="tabBtn_circuit-diagram" onclick="switchTab('circuit-diagram')">Circuit Diagram</button>
+      <button class="tab-link" id="tabBtn_formulas" onclick="switchTab('formulas')">Formulas</button>
+      <button class="tab-link active" id="tabBtn_simulation" onclick="switchTab('simulation')">Simulation</button>
+      <button class="tab-link" id="tabBtn_observations" onclick="switchTab('observations')">Observations</button>
+      <button class="tab-link" id="tabBtn_result" onclick="switchTab('result')">Result</button>
+    </nav>
+
+    <!-- ==========================================================
+         TAB CONTENTS
+         ========================================================== -->
+    
+    <!-- TAB: AIM -->
+    <div class="tab-content" id="tabContent_aim">
+      <div class="text-layout">
+        <h2>Aim</h2>
+        <p>To verify the <strong>Superposition Theorem</strong> experimentally for a linear, bilateral electrical network containing multiple independent DC voltage sources.</p>
+        <p>Specifically, to show that the load current flowing in the middle branch containing resistor <strong>R3 (47Ω)</strong> when both voltage sources ($V_1$ and $V_2$) are active simultaneously is equal to the algebraic sum of the individual load currents flowing when each source acts alone, with all other independent sources replaced by their internal resistances (short-circuited).</p>
+      </div>
+    </div>
+
+    <!-- TAB: APPARATUS -->
+    <div class="tab-content" id="tabContent_apparatus">
+      <div class="text-layout">
+        <h2>Apparatus Required</h2>
+        <p>The virtual experiment comprises the following laboratory components:</p>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem;">
+          <thead>
+            <tr>
+              <th style="background-color: var(--bg-panel-header); border: 1px solid var(--border-color); padding: 0.5rem;">S.No.</th>
+              <th style="background-color: var(--bg-panel-header); border: 1px solid var(--border-color); padding: 0.5rem;">Apparatus Name</th>
+              <th style="background-color: var(--bg-panel-header); border: 1px solid var(--border-color); padding: 0.5rem;">Specification / Rating</th>
+              <th style="background-color: var(--bg-panel-header); border: 1px solid var(--border-color); padding: 0.5rem;">Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">1</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Superposition Theorem Trainer PCB</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Resistors R1=82Ω, R2=100Ω, R3=47Ω, R4=56Ω</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">1</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">2</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Regulated DC Power Supply</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Variable Supply (0-15V), Fixed Supply (15V)</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">1</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">3</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Digital Voltmeter (DC)</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Range 0 - 20 V (Internal Resistance 10 MΩ)</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">1</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">4</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Digital Ammeter (DC)</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Range 0 - 200 mA (Internal Resistance 0.1 Ω)</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">1</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">5</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Patch Connectors (Jumper Wires)</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem;">Flexible copper cords (Red, Black, Yellow)</td>
+              <td style="border: 1px solid var(--border-color); padding: 0.5rem; text-align: center;">Assorted</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: PROCEDURE -->
+    <div class="tab-content" id="tabContent_procedure">
+      <div class="text-layout">
+        <h2>Experimental Procedure</h2>
+        <ol>
+          <li>Switch <strong>ON</strong> the main trainer board power toggle switch (bottom right).</li>
+          <li><strong>Step 1: Connect Input V1</strong>
+            <ul>
+              <li>Connect Variable supply + (term_vvar1) to A (term_sup_a) using a red wire.</li>
+              <li>Connect Gnd (term_gnd1) to B (term_sup_b) using a black wire.</li>
+            </ul>
+          </li>
+          <li><strong>Step 2: Insert the Ammeter in Series</strong>
+            <ul>
+              <li>Connect Node AM_A (term_sup_ama) to Ammeter + (term_ipos).</li>
+              <li>Connect Node AM_F (term_sup_amf) to Ammeter - (term_ineg).</li>
+            </ul>
+          </li>
+          <li><strong>Step 3: Connect the Voltmeter</strong>
+            <ul>
+              <li>Connect Node E (term_sup_e) to Voltmeter + (term_vpos).</li>
+              <li>Connect Node B (term_sup_b) to Voltmeter - (term_vneg).</li>
+            </ul>
+          </li>
+          <li><strong>Step 4: Wire the states to verify superposition</strong>
+            <ul>
+              <li><strong>Both Active</strong>: Apply +15V Fixed to C (term_sup_c) and Gnd to D (term_sup_d). Slide the Variable Voltage V1 control in the sidebar. Click <strong>Add Row</strong> to record values.</li>
+              <li><strong>V1 Only</strong>: Short C to D using a yellow jumper. Record the load current as $I_1$ on the ammeter.</li>
+              <li><strong>V2 Only</strong>: Short A to B using a yellow jumper. Connect +15V Fixed to C and Gnd to D. Record the load current as $I_2$ on the ammeter.</li>
+            </ul>
+          </li>
+          <li>Check that the total current is the algebraic sum: $I_3 = I_1 + I_2$.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- TAB: CIRCUIT DIAGRAM -->
+    <div class="tab-content" id="tabContent_circuit-diagram">
+      <div class="text-layout" style="text-align: center;">
+        <h2>Superposition Circuit Schematic</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 500px; margin: 0.5rem auto 1rem auto;">
+          Select a mode below to view the theoretical circuit configuration. The schematic values will update live as the regulators are adjusted.
+        </p>
+        
+        <!-- Toggle buttons inside Circuit Diagram tab -->
+        <div style="display: flex; justify-content: center; gap: 0.75rem; margin: 1rem 0;">
+          <button class="btn btn-auto" id="btnSchemBoth" onclick="setSchematicViewMode('both')" style="padding: 6px 14px; font-size: 0.8rem; border-color: var(--color-both); color: var(--color-both); background: rgba(0,240,255,0.05); cursor: pointer;">Both Active</button>
+          <button class="btn btn-auto" id="btnSchemV1" onclick="setSchematicViewMode('v1_only')" style="padding: 6px 14px; font-size: 0.8rem; border-color: var(--border-color); color: var(--text-muted); cursor: pointer;">V1 Only</button>
+          <button class="btn btn-auto" id="btnSchemV2" onclick="setSchematicViewMode('v2_only')" style="padding: 6px 14px; font-size: 0.8rem; border-color: var(--border-color); color: var(--text-muted); cursor: pointer;">V2 Only</button>
+        </div>
+
+        <div style="background-color: #04060d; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); display: inline-block; width: 100%; max-width: 420px; margin-top: 0.5rem;">
+          <!-- Vector circuit drawing (Dynamic live view) -->
+          <svg width="100%" height="260" viewBox="0 0 320 240" id="liveCircuitGlowSvg" style="display: block; margin: 0 auto;">
+            <!-- Connection lines -->
+            <line x1="40" y1="50" x2="110" y2="50" stroke="#fff" stroke-width="1.5" />
+            
+            <!-- R1 -->
+            <rect x="110" y="42" width="30" height="16" fill="#04060d" stroke="#fff" stroke-width="1.2" />
+            <text x="125" y="52" fill="#fff" font-size="6" text-anchor="middle">R1 (82)</text>
+            
+            <line x1="140" y1="50" x2="200" y2="50" stroke="#fff" stroke-width="1.5" />
+            <circle cx="200" cy="50" r="3" fill="#ff3b30" />
+            <text x="200" y="43" fill="#ff3b30" font-size="7" font-weight="bold" text-anchor="middle" id="liveSchemVEText">VE</text>
+            
+            <!-- R2 -->
+            <rect x="230" y="42" width="30" height="16" fill="#04060d" stroke="#fff" stroke-width="1.2" />
+            <text x="245" y="52" fill="#fff" font-size="6" text-anchor="middle">R2 (100)</text>
+            
+            <line x1="200" y1="50" x2="230" y2="50" stroke="#fff" stroke-width="1.5" />
+            <line x1="260" y1="50" x2="280" y2="50" stroke="#fff" stroke-width="1.5" />
+            <line x1="280" y1="50" x2="280" y2="106" stroke="#fff" stroke-width="1.5" />
+            
+            <!-- V1 Source circle / shorted state -->
+            <g id="liveSchemV1Group">
+              <g id="liveSchemV1Active">
+                <circle cx="40" cy="120" r="14" fill="none" stroke="var(--color-v1)" stroke-width="2" />
+                <text x="40" y="123" fill="#fff" font-size="8" text-anchor="middle" id="liveSchemV1Text">0.0V</text>
+              </g>
+              <g id="liveSchemV1Shorted" style="display: none;">
+                <line x1="40" y1="106" x2="40" y2="134" stroke="#ffcc00" stroke-width="3" />
+                <text x="24" y="123" fill="#ffcc00" font-size="7" font-weight="bold" text-anchor="end">SHORT</text>
+              </g>
+            </g>
+            
+            <!-- V2 Source circle / shorted state -->
+            <g id="liveSchemV2Group">
+              <g id="liveSchemV2Active">
+                <circle cx="280" cy="120" r="14" fill="none" stroke="var(--color-v2)" stroke-width="2" />
+                <text x="280" y="123" fill="#fff" font-size="8" text-anchor="middle" id="liveSchemV2Text">15.0V</text>
+              </g>
+              <g id="liveSchemV2Shorted" style="display: none;">
+                <line x1="280" y1="106" x2="280" y2="134" stroke="#ffcc00" stroke-width="3" />
+                <text x="296" y="123" fill="#ffcc00" font-size="7" font-weight="bold" text-anchor="start">SHORT</text>
+              </g>
+            </g>
+            
+            <!-- R3 -->
+            <line x1="200" y1="50" x2="200" y2="80" stroke="#fff" stroke-width="1.5" />
+            <rect x="193" y="80" width="14" height="30" fill="#04060d" stroke="#fff" stroke-width="1.2" />
+            <text x="200" y="97" fill="#fff" font-size="6" text-anchor="middle" transform="rotate(-90, 200, 95)">R3 (47)</text>
+            <line x1="200" y1="110" x2="200" y2="130" stroke="#fff" stroke-width="1.5" />
+            
+            <!-- Ammeter inside R3 branch -->
+            <circle cx="200" cy="142" r="10" fill="#1c1c1e" stroke="#00f0ff" stroke-width="1.5" />
+            <text x="200" y="145" fill="#00f0ff" font-size="8" font-weight="bold" text-anchor="middle">A</text>
+            <line x1="200" y1="152" x2="200" y2="180" stroke="#fff" stroke-width="1.5" />
+            
+            <!-- R4 -->
+            <line x1="40" y1="134" x2="40" y2="180" stroke="#fff" stroke-width="1.5" />
+            <line x1="40" y1="180" x2="130" y2="180" stroke="#fff" stroke-width="1.5" />
+            <rect x="130" y="172" width="60" height="16" fill="#04060d" stroke="#fff" stroke-width="1.2" />
+            <text x="160" y="182" fill="#fff" font-size="6" text-anchor="middle">R4 (56)</text>
+            <line x1="190" y1="180" x2="280" y2="180" stroke="#fff" stroke-width="1.5" />
+            <line x1="280" y1="134" x2="280" y2="180" stroke="#fff" stroke-width="1.5" />
+            
+            <!-- Ground Connection -->
+            <line x1="160" y1="180" x2="160" y2="195" stroke="#fff" stroke-width="1.5" />
+            <line x1="152" y1="195" x2="168" y2="195" stroke="#fff" stroke-width="2" />
+            <line x1="155" y1="199" x2="165" y2="199" stroke="#fff" stroke-width="1.5" />
+            <line x1="158" y1="203" x2="162" y2="203" stroke="#fff" stroke-width="1" />
+            
+            <!-- Node Labels -->
+            <circle cx="40" cy="50" r="2.5" fill="#fff" />
+            <text x="32" y="47" fill="#8892b0" font-size="8" font-weight="bold">A</text>
+            
+            <circle cx="40" cy="180" r="2.5" fill="#fff" />
+            <text x="32" y="190" fill="#8892b0" font-size="8" font-weight="bold">B</text>
+            
+            <circle cx="280" cy="50" r="2.5" fill="#fff" />
+            <text x="288" y="47" fill="#8892b0" font-size="8" font-weight="bold">C</text>
+            
+            <circle cx="280" cy="180" r="2.5" fill="#fff" />
+            <text x="288" y="190" fill="#8892b0" font-size="8" font-weight="bold">D</text>
+
+            <!-- Current reading label near ammeter -->
+            <text x="200" y="222" fill="var(--color-both)" font-size="8" font-weight="bold" text-anchor="middle" id="liveSchemI3Text">I3 = 0.0mA</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: FORMULAS -->
+    <div class="tab-content" id="tabContent_formulas">
+      <div class="text-layout">
+        <h2>Mathematical Formulas & Analysis</h2>
+        <p>The mathematical verification of the superposition theorem uses Nodal analysis and Mesh equations as follows:</p>
+        
+        <div id="formulaBox" style="background-color: rgba(4,6,13,0.5); padding: 1.25rem; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 1rem;">
+          <!-- Populated dynamically via renderLiveFormulas() -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SIMULATION (PRIMARY LAB INTERFACE) -->
+    <div class="tab-content" id="tabContent_simulation" style="display: block;">
+      <div class="simulation-grid">
+        
+        <!-- COLUMN 1: ANALOG TRAINER BOARD / PCB CONTAINER -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 id="leftPanelTitle"><i class="fa-solid fa-microchip" style="color: var(--color-v1); margin-right: 6px;"></i> Physical Kit representation</h2>
+          </div>
+          <div class="panel-body" style="padding: 0.5rem;">
+            
+            <div class="bench-view">
+              
+              <!-- Theory schematic container (toggled on/off) -->
+              <div id="theorySchematicContainer" style="display: none; width: 100%; aspect-ratio: 2.0; background-color: #04060d; border: 4px solid #1e293b; border-radius: 8px; position: relative;">
+                <!-- Vector circuit schematic shown on left inside theory mode -->
+                <svg width="100%" height="100%" viewBox="0 0 500 250" id="theoryOverlaySvg">
+                  <rect x="0" y="0" width="500" height="250" fill="none" />
+                  <!-- Schematic diagram nodes -->
+                  <circle cx="50" cy="125" r="15" fill="none" stroke="var(--color-v1)" stroke-width="2" />
+                  <text x="50" y="129" fill="#fff" font-size="9" text-anchor="middle" font-family="'Orbitron', sans-serif">V1</text>
+                  <line x1="50" y1="110" x2="50" y2="50" stroke="#fff" stroke-width="1.5" />
+                  <line x1="50" y1="50" x2="120" y2="50" stroke="#fff" stroke-width="1.5" />
+                  
+                  <rect x="120" y="42" width="40" height="16" fill="#0d1222" stroke="#fff" stroke-width="1" />
+                  <text x="140" y="52" fill="#fff" font-size="7" text-anchor="middle">82E (R1)</text>
+                  
+                  <line x1="160" y1="50" x2="250" y2="50" stroke="#fff" stroke-width="1.5" />
+                  <circle cx="250" cy="50" r="3.5" fill="#ff3b30" />
+                  <text x="250" y="43" fill="#ff3b30" font-size="8" font-weight="bold" text-anchor="middle">E</text>
+                  
+                  <rect x="340" y="42" width="40" height="16" fill="#0d1222" stroke="#fff" stroke-width="1" />
+                  <text x="360" y="52" fill="#fff" font-size="7" text-anchor="middle">100E (R2)</text>
+                  
+                  <line x1="250" y1="50" x2="340" y2="50" stroke="#fff" stroke-width="1.5" />
+                  <line x1="380" y1="50" x2="450" y2="50" stroke="#fff" stroke-width="1.5" />
+                  <line x1="450" y1="50" x2="450" y2="110" stroke="#fff" stroke-width="1.5" />
+                  <circle cx="450" cy="125" r="15" fill="none" stroke="var(--color-v2)" stroke-width="2" />
+                  <text x="450" y="129" fill="#fff" font-size="8" text-anchor="middle" font-family="'Orbitron', sans-serif">15V Fixed</text>
+                  
+                  <!-- Middle Branch R3 -->
+                  <line x1="250" y1="50" x2="250" y2="80" stroke="#fff" stroke-width="1.5" />
+                  <rect x="242" y="80" width="16" height="40" fill="#0d1222" stroke="#fff" stroke-width="1" />
+                  <text x="250" y="103" fill="#fff" font-size="7" text-anchor="middle" transform="rotate(-90, 250, 100)">47E (R3)</text>
+                  <line x1="250" y1="120" x2="250" y2="150" stroke="#fff" stroke-width="1.5" />
+                  
+                  <!-- Bottom ground loop -->
+                  <line x1="50" y1="140" x2="50" y2="200" stroke="#fff" stroke-width="1.5" />
+                  <line x1="50" y1="200" x2="210" y2="200" stroke="#fff" stroke-width="1.5" />
+                  <rect x="210" y="192" width="80" height="16" fill="#0d1222" stroke="#fff" stroke-width="1" />
+                  <text x="250" y="202" fill="#fff" font-size="7" text-anchor="middle">56E (R4)</text>
+                  <line x1="290" y1="200" x2="450" y2="200" stroke="#fff" stroke-width="1.5" />
+                  <line x1="450" y1="140" x2="450" y2="200" stroke="#fff" stroke-width="1.5" />
+                  
+                  <!-- Connectors label -->
+                  <text x="250" y="165" fill="var(--color-both)" font-size="8" text-anchor="middle" font-weight="bold">Ammeter Branch</text>
+                </svg>
+              </div>
+
+              <!-- Green PCB container -->
+              <div class="trainer-bezel" id="trainerBezel">
+                <div class="trainer-faceplate" id="pcbContainer">
+                  
+                  <!-- SVG PCB overlay -->
+                  <svg class="faceplate-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" id="faceplateSvg">
+                    
+                    <defs>
+                      <filter id="postShadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.5"/>
+                      </filter>
+                      <filter id="ledGlow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                        <feMerge>
+                          <feMergeNode in="blur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                      
+                      <!-- Binding post graphics red/black -->
+                      <g id="post-red">
+                        <circle cx="0" cy="0" r="9" fill="#1c1c1c" filter="url(#postShadow)" />
+                        <circle cx="0" cy="0" r="7" fill="#ff3b30" />
+                        <circle cx="0" cy="0" r="3.5" fill="#e5e5ea" />
+                        <circle cx="0" cy="0" r="1.5" fill="#1c1c1c" />
+                      </g>
+                      
+                      <g id="post-black">
+                        <circle cx="0" cy="0" r="9" fill="#1c1c1c" filter="url(#postShadow)" />
+                        <circle cx="0" cy="0" r="7" fill="#2c2c2e" />
+                        <circle cx="0" cy="0" r="3.5" fill="#e5e5ea" />
+                        <circle cx="0" cy="0" r="1.5" fill="#1c1c1c" />
+                      </g>
+
+                      <!-- Solder trace lines -->
+                      <g id="solder-pads">
+                        <circle cx="0" cy="0" r="6" fill="#d4af37" opacity="0.4" />
+                        <circle cx="0" cy="0" r="2.5" fill="#0b0c10" />
+                      </g>
+                      
+                      <!-- Lever switch metal cap -->
+                      <linearGradient id="leverMetal" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#bbbbbb" />
+                        <stop offset="50%" stop-color="#ffffff" />
+                        <stop offset="100%" stop-color="#888888" />
+                      </linearGradient>
+                    </defs>
+                    
+                    <!-- PCB grid overlays & shadows -->
+                    <rect x="0" y="0" width="1000" height="500" fill="none" />
+                    
+                    <!-- Mounting Screws in corners -->
+                    <circle cx="15" cy="15" r="5" fill="#8c8c8c" stroke="#5c5c5c" stroke-width="1.5" />
+                    <line x1="11" y1="15" x2="19" y2="15" stroke="#5c5c5c" stroke-width="1" />
+                    
+                    <circle cx="985" cy="15" r="5" fill="#8c8c8c" stroke="#5c5c5c" stroke-width="1.5" />
+                    <line x1="981" y1="15" x2="989" y2="15" stroke="#5c5c5c" stroke-width="1" />
+                    
+                    <circle cx="15" cy="485" r="5" fill="#8c8c8c" stroke="#5c5c5c" stroke-width="1.5" />
+                    <line x1="11" y1="485" x2="19" y2="485" stroke="#5c5c5c" stroke-width="1" />
+                    
+                    <circle cx="985" cy="485" r="5" fill="#8c8c8c" stroke="#5c5c5c" stroke-width="1.5" />
+                    <line x1="981" y1="485" x2="989" y2="485" stroke="#5c5c5c" stroke-width="1" />
+                    
+                    <!-- Silkscreen Box Header Title -->
+                    <rect x="230" y="30" width="540" height="25" fill="#0a542b" stroke="#fff" stroke-width="1.5" rx="3" />
+                    <text x="500" y="47" font-family="'Orbitron', sans-serif" font-weight="700" fill="#fff" font-size="11" text-anchor="middle" letter-spacing="1.5">SUPERPOSITION THEOREM EXPERIMENT KIT</text>
+
+                     <!-- POWER SUPPLY MODULE (LEFT) -->
+                    <rect x="25" y="160" width="200" height="320" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" rx="5" />
+                    <text x="125" y="180" font-family="'Orbitron', sans-serif" font-size="8.5" font-weight="700" fill="rgba(255,255,255,0.5)" text-anchor="middle" letter-spacing="0.5">REGULATED POWER SUPPLY</text>
+
+                    <!-- +15V Fixed -->
+                    <text x="45" y="215" font-family="'Orbitron', sans-serif" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="start">+15V Fixed</text>
+                    <use id="term_vfixed1" href="#post-red" x="140" y="210" class="binding-post" onclick="handleTermClick('term_vfixed1', 140, 210, 1)" />
+                    <use id="term_vfixed2" href="#post-red" x="180" y="210" class="binding-post" onclick="handleTermClick('term_vfixed2', 180, 210, 1)" />
+
+                    <!-- Variable 0 to +15V -->
+                    <text x="45" y="275" font-family="'Orbitron', sans-serif" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="start">0 to +15V</text>
+                    <use id="term_vvar1" href="#post-red" x="140" y="270" class="binding-post" onclick="handleTermClick('term_vvar1', 140, 270, 2)" />
+                    <use id="term_vvar2" href="#post-red" x="180" y="270" class="binding-post" onclick="handleTermClick('term_vvar2', 180, 270, 2)" />
+
+                    <!-- Gnd -->
+                    <text x="45" y="335" font-family="'Orbitron', sans-serif" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="start">Gnd</text>
+                    <use id="term_gnd1" href="#post-black" x="140" y="330" class="binding-post" onclick="handleTermClick('term_gnd1', 140, 330, 0)" />
+                    <use id="term_gnd2" href="#post-black" x="180" y="330" class="binding-post" onclick="handleTermClick('term_gnd2', 180, 330, 0)" />
+
+                    <!-- Rotary dial container -->
+                    <text x="125" y="440" font-family="'Orbitron', sans-serif" font-weight="600" fill="#ffffff" font-size="8.5" text-anchor="middle">Voltage (0 to +15V)</text>
+                    <text id="lblVoltValue" x="125" y="455" font-family="'Orbitron', sans-serif" font-weight="bold" fill="#ff3b30" font-size="9.5" text-anchor="middle">10.0 V</text>
+                    
+                    <!-- ROTARY KNOB DRAGGABLE GRAPHIC -->
+                    <g id="voltageDial" class="rotary-knob" style="cursor: grab;">
+                      <circle cx="125" cy="400" r="25" fill="#1a1a1a" stroke="#cbd5e1" stroke-width="3" filter="url(#postShadow)" />
+                      <line x1="125" y1="400" x2="125" y2="375" stroke="#ff3b30" stroke-width="3.5" stroke-linecap="round" />
+                    </g>
+
+                    <!-- VOLTMETER & CURRENT METERS (TOP) -->
+                    <rect x="300" y="70" width="160" height="60" fill="#04060d" stroke="#1e293b" stroke-width="1.5" rx="4" />
+                    <text id="bgVolts" x="380" y="112" font-family="'Orbitron', monospace" font-size="28" fill="#1a0404" font-weight="900" text-anchor="middle" style="display: none;">8.8.8.8</text>
+                    <text id="txtVolts" x="380" y="112" class="led-display-panel led-inactive" font-family="'Orbitron', monospace" font-size="28" font-weight="900" text-anchor="middle" style="display: none;">0.00</text>
+                    <text x="380" y="145" font-family="sans-serif" font-weight="600" fill="#a8a29e" font-size="8.5" text-anchor="middle">VOLT METER (0 - 20V)</text>
+                    
+                    <use id="term_vpos" href="#post-red" x="485" y="82" class="binding-post" onclick="handleTermClick('term_vpos', 485, 82, 10)" />
+                    <use id="term_vneg" href="#post-black" x="485" y="118" class="binding-post" onclick="handleTermClick('term_vneg', 485, 118, 11)" />
+
+                    <rect x="560" y="70" width="160" height="60" fill="#04060d" stroke="#1e293b" stroke-width="1.5" rx="4" />
+                    <text id="bgAmps" x="640" y="112" font-family="'Orbitron', monospace" font-size="28" fill="#1a0404" font-weight="900" text-anchor="middle" style="display: none;">8.8.8.8</text>
+                    <text id="txtAmps" x="640" y="112" class="led-display-panel led-inactive" font-family="'Orbitron', monospace" font-size="28" font-weight="900" text-anchor="middle" style="display: none;">0.00</text>
+                    <text x="640" y="145" font-family="sans-serif" font-weight="600" fill="#a8a29e" font-size="8.5" text-anchor="middle">CURRENT METER (0 - 200mA)</text>
+                    
+                    <use id="term_ipos" href="#post-red" x="745" y="82" class="binding-post" onclick="handleTermClick('term_ipos', 745, 82, 12)" />
+                    <use id="term_ineg" href="#post-black" x="745" y="118" class="binding-post" onclick="handleTermClick('term_ineg', 745, 118, 13)" />
+
+                    <!-- SUPERPOSITION THEOREM MODULE (CENTER) -->
+                    <text x="540" y="470" font-family="'Orbitron', sans-serif" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="1">SUPERPOSITION THEOREM</text>
+
+                    <!-- Copper Traces -->
+                    <path d="M 425 230 L 655 230" fill="none" stroke="#e0e8e0" stroke-width="2" stroke-linecap="round" />
+                    <path d="M 425 410 L 655 410" fill="none" stroke="#e0e8e0" stroke-width="2" stroke-linecap="round" />
+                    <path d="M 425 230 L 425 410" fill="none" stroke="#e0e8e0" stroke-width="2" stroke-linecap="round" />
+                    <path d="M 655 230 L 655 410" fill="none" stroke="#e0e8e0" stroke-width="2" stroke-linecap="round" />
+                    <path d="M 540 230 L 540 410" fill="none" stroke="#e0e8e0" stroke-width="2" stroke-linecap="round" />
+
+                    <use href="#solder-pads" x="425" y="230" />
+                    <use href="#solder-pads" x="540" y="230" />
+                    <use href="#solder-pads" x="655" y="230" />
+                    <use href="#solder-pads" x="425" y="410" />
+                    <use href="#solder-pads" x="540" y="410" />
+                    <use href="#solder-pads" x="655" y="410" />
+
+                    <!-- V1 Battery symbol on track -->
+                    <rect x="415" y="300" width="20" height="20" fill="var(--pcb-green)" />
+                    <line x1="417" y1="306" x2="433" y2="306" stroke="#fff" stroke-width="2" />
+                    <line x1="421" y1="312" x2="429" y2="312" stroke="#fff" stroke-width="1.2" />
+                    <line x1="417" y1="318" x2="433" y2="318" stroke="#fff" stroke-width="2" />
+                    <line x1="421" y1="324" x2="429" y2="324" stroke="#fff" stroke-width="1.2" />
+                    <text x="445" y="316" font-family="sans-serif" font-size="9" font-weight="bold" fill="#fff">V1</text>
+                    <text x="425" y="252" font-family="sans-serif" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">+</text>
+                    <text x="425" y="398" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">-</text>
+                    
+                    <!-- V2 Battery symbol on track -->
+                    <rect x="645" y="300" width="20" height="20" fill="var(--pcb-green)" />
+                    <line x1="647" y1="306" x2="663" y2="306" stroke="#fff" stroke-width="2" />
+                    <line x1="651" y1="312" x2="659" y2="312" stroke="#fff" stroke-width="1.2" />
+                    <line x1="647" y1="318" x2="663" y2="318" stroke="#fff" stroke-width="2" />
+                    <line x1="651" y1="324" x2="659" y2="324" stroke="#fff" stroke-width="1.2" />
+                    <text x="635" y="316" font-family="sans-serif" font-size="9" font-weight="bold" fill="#fff" text-anchor="end">V2</text>
+                    <text x="655" y="252" font-family="sans-serif" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">+</text>
+                    <text x="655" y="398" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">-</text>
+
+                    <!-- Resistors -->
+                    <!-- R1 (82E) -->
+                    <rect x="465" y="222" width="30" height="16" fill="var(--pcb-green)" />
+                    <rect x="468" y="226" width="24" height="8" rx="2" fill="#e2cab5" stroke="#9e8470" stroke-width="1" />
+                    <rect x="472" y="226" width="2" height="8" fill="#808080" />
+                    <rect x="476" y="226" width="2" height="8" fill="#ff0000" />
+                    <rect x="480" y="226" width="2" height="8" fill="#000000" />
+                    <text x="480" y="217" font-family="sans-serif" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">82E</text>
+
+                    <!-- R2 (100E) -->
+                    <rect x="580" y="222" width="30" height="16" fill="var(--pcb-green)" />
+                    <rect x="583" y="226" width="24" height="8" rx="2" fill="#e2cab5" stroke="#9e8470" stroke-width="1" />
+                    <rect x="587" y="226" width="2" height="8" fill="#8b4513" />
+                    <rect x="591" y="226" width="2" height="8" fill="#000000" />
+                    <rect x="595" y="226" width="2" height="8" fill="#8b4513" />
+                    <text x="595" y="217" font-family="sans-serif" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">100E</text>
+
+                    <!-- R3 (47E) -->
+                    <rect x="532" y="360" width="16" height="30" fill="var(--pcb-green)" />
+                    <rect x="536" y="363" width="8" height="24" rx="2" fill="#e2cab5" stroke="#9e8470" stroke-width="1" />
+                    <rect x="536" y="367" width="8" height="2" fill="#ffff00" />
+                    <rect x="536" y="371" width="8" height="2" fill="#ee82ee" />
+                    <rect x="536" y="375" width="8" height="2" fill="#000000" />
+                    <text x="552" y="378" font-family="sans-serif" font-size="8" font-weight="bold" fill="#fff">47E</text>
+
+                    <!-- R4 (56E) -->
+                    <rect x="580" y="402" width="30" height="16" fill="var(--pcb-green)" />
+                    <rect x="583" y="406" width="24" height="8" rx="2" fill="#e2cab5" stroke="#9e8470" stroke-width="1" />
+                    <rect x="587" y="406" width="2" height="8" fill="#008000" />
+                    <rect x="591" y="406" width="2" height="8" fill="#0000ff" />
+                    <rect x="595" y="406" width="2" height="8" fill="#000000" />
+                    <text x="595" y="425" font-family="sans-serif" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">56E</text>
+
+                    <circle cx="540" cy="320" r="10" fill="none" stroke="#fff" stroke-width="1.5" />
+                    <text x="540" y="323" font-family="sans-serif" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">A</text>
+
+                    <text x="395" y="234" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">A</text>
+                    <text x="395" y="415" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">B</text>
+                    <text x="672" y="234" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">C</text>
+                    <text x="672" y="415" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">D</text>
+                    <text x="540" y="215" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">E</text>
+
+                    <!-- POWER SWITCH MODULE (BOTTOM RIGHT) -->
+                    <rect x="850" y="320" width="120" height="150" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" rx="5" />
+                    <text x="910" y="340" font-family="'Orbitron', sans-serif" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" letter-spacing="0.5">POWER</text>
+                    <text x="910" y="450" font-family="'Orbitron', sans-serif" fill="#ffffff" font-size="8" text-anchor="middle">OFF</text>
+                    <text x="910" y="415" font-family="'Orbitron', sans-serif" fill="#ffffff" font-size="8" text-anchor="middle">ON</text>
+                    
+                    <circle id="ledPowerGlow" cx="910" cy="360" r="9" fill="#200" opacity="0.3" filter="url(#ledGlow)" />
+                    <circle id="ledPower" cx="910" cy="360" r="5" fill="#500" />
+
+                    <g id="switchToggle" class="toggle-switch" transform="translate(910, 432) rotate(180)" onclick="toggleMainPower()">
+                      <rect x="-10" y="-20" width="20" height="40" rx="4" fill="#0d0e12" stroke="#4a4c59" stroke-width="1.5" />
+                      <line x1="-7" y1="0" x2="7" y2="0" stroke="#8a8f9f" stroke-width="1" />
+                      <g id="switchLever" transform="translate(0, 0)">
+                        <line x1="0" y1="0" x2="0" y2="12" stroke="url(#leverMetal)" stroke-width="6" stroke-linecap="round" />
+                        <circle cx="0" cy="12" r="5" fill="url(#leverMetal)" />
+                      </g>
+                    </g>
+
+                    <!-- Superposition Nodes binding posts -->
+                    <use id="term_sup_a" href="#post-red" x="425" y="230" class="binding-post" onclick="handleTermClick('term_sup_a', 425, 230, 3)" />
+                    <use id="term_sup_b" href="#post-black" x="425" y="410" class="binding-post" onclick="handleTermClick('term_sup_b', 425, 410, 4)" />
+                    <use id="term_sup_e" href="#post-red" x="540" y="230" class="binding-post" onclick="handleTermClick('term_sup_e', 540, 230, 7)" />
+                    <use id="term_sup_c" href="#post-red" x="655" y="230" class="binding-post" onclick="handleTermClick('term_sup_c', 655, 230, 5)" />
+                    <use id="term_sup_d" href="#post-black" x="655" y="410" class="binding-post" onclick="handleTermClick('term_sup_d', 655, 410, 6)" />
+                    <use id="term_sup_ama" href="#post-red" x="540" y="290" class="binding-post" onclick="handleTermClick('term_sup_ama', 540, 290, 8)" />
+                    <use id="term_sup_amf" href="#post-black" x="540" y="350" class="binding-post" onclick="handleTermClick('term_sup_amf', 540, 350, 9)" />
+
+                    <!-- Wire rendering layers -->
+                    <g id="wiresGroup"></g>
+                    <path id="dragWire" d="" stroke="#ff3b30" stroke-width="4.5" stroke-dasharray="4, 4" fill="none" opacity="0" pointer-events="none" />
+
+                  </svg>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- COLUMN 3: SIDEBAR CONTROL PANEL -->
+        <div class="panel controls-sidebar">
+          <div class="panel-header">
+            <h2><i class="fa-solid fa-sliders"></i> Control Panel</h2>
+          </div>
+          <div class="panel-body">
+            
+            <!-- Voltage Slider -->
+            <div class="sidebar-sliders">
+              <div id="sliderGroupV1" class="slider-group">
+                <div class="slider-header">
+                  <span class="slider-title">Variable Voltage (V1)</span>
+                  <span class="slider-value" id="lblSliderVolt">10.0 V</span>
+                </div>
+                <input type="range" id="sliderVolt" min="0" max="15" step="0.1" value="10.0" class="custom-slider" oninput="handleSliderVoltChange(this.value)">
+              </div>
+
+              <div id="sliderGroupV2" class="slider-group" style="opacity: 0.5;">
+                <div class="slider-header">
+                  <span class="slider-title">Fixed Voltage (V2)</span>
+                  <span class="slider-value" id="lblSliderFixed">15.0 V</span>
+                </div>
+                <input type="range" id="sliderFixed" min="15" max="15" step="0" value="15.0" class="custom-slider" disabled>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="sidebar-buttons">
+              <button class="btn btn-record" onclick="logObservations()">
+                <i class="fa-solid fa-circle-plus"></i> Record Values
+              </button>
+              <button class="btn btn-theory" id="btnTheoryToggle" onclick="toggleTheoryMode()">
+                <i class="fa-solid fa-shuffle"></i> Toggle Theory Mode
+              </button>
+              <button class="btn btn-auto" id="btnAutoBoth" onclick="applyPreset('both')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto Both Active
+              </button>
+              <button class="btn btn-auto" id="btnAutoV1" onclick="applyPreset('v1_only')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto V1 Only
+              </button>
+              <button class="btn btn-auto" id="btnAutoV2" onclick="applyPreset('v2_only')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto V2 Only
+              </button>
+              <button class="btn" style="border-color: #ff3b30; color: #ff3b30;" onclick="clearAllWires()">
+                <i class="fa-solid fa-trash"></i> Clear All Wires
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- KEY PARAMETERS BOTTOM PANEL -->
+      <div class="panel key-params-panel" style="margin-top: 1.5rem;">
+        <div class="panel-header" style="background: transparent; border-bottom: 1px solid var(--border-color); padding: 0 0 0.5rem 0; margin-bottom: 1rem;">
+          <h2><i class="fa-solid fa-gauge-high" style="color: var(--color-both); margin-right: 6px;"></i> Key parameters dashboard</h2>
+        </div>
+        
+        <div class="key-params-grid">
+          <div class="param-card" id="cardParamVoc">
+            <div class="param-label">Voc (Open E-Node)</div>
+            <div class="param-value" id="paramVoc" style="color: #00ff66;">12.25 V</div>
+          </div>
+          <div class="param-card" id="cardParamIsc">
+            <div class="param-label">Isc (Max Supply Current)</div>
+            <div class="param-value" id="paramIsc" style="color: #ff3b30;">121.95 mA</div>
+          </div>
+          <div class="param-card" id="cardParamPmax">
+            <div class="param-label">Pmax (Load Limit)</div>
+            <div class="param-value" id="paramPmax" style="color: #ff9f1c;">371.18 mW</div>
+          </div>
+          <div class="param-card" id="cardParamI1">
+            <div class="param-label">I1 (V1 acting alone)</div>
+            <div class="param-value" id="paramI1" style="color: #00f0ff;">37.11 mA</div>
+          </div>
+          <div class="param-card" id="cardParamI2">
+            <div class="param-label">I2 (V2 acting alone)</div>
+            <div class="param-value" id="paramI2" style="color: #ff9f1c;">45.65 mA</div>
+          </div>
+          <div class="param-card" id="cardParamI3">
+            <div class="param-label">I3 = I1 + I2</div>
+            <div class="param-value" id="paramI3" style="color: #00ff66;">82.76 mA</div>
+          </div>
+          <div class="param-card" id="cardParamI3Direct">
+            <div class="param-label">I3_direct (KVL)</div>
+            <div class="param-value" id="paramI3Direct" style="color: #00f0ff;">82.76 mA</div>
+          </div>
+          <div class="param-card" id="cardParamVerify">
+            <div class="param-label">Validation Status</div>
+            <div class="param-value" id="paramVerify">
+              <span style="font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; font-family: 'Orbitron', sans-serif; font-weight: bold; background-color: rgba(0, 255, 102, 0.15); border: 1px solid #00ff66; color: #00ff66;">✔ Verified</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="operating-point-row" id="paramOperatingPoint">
+          <span>Operating Point: V_E = 6.26 V, I_3 = 132.89 mA, P = 1819.52 mW, RL = 103.0 Ω</span>
+          <span style="color: var(--color-v1);">Superposition Theorem Solver Engine Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: OBSERVATIONS (observation table list view) -->
+    <div class="tab-content" id="tabContent_observations">
+      <div class="panel">
+        <div class="panel-header">
+          <h2><i class="fa-solid fa-table"></i> Logged Observation Records</h2>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-success" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; width: auto;" onclick="exportCSV()">
+              <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+            <button class="btn" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; border-color: #ff2e2e; color: #ff2e2e; width: auto;" onclick="clearObservations()">
+              <i class="fa-solid fa-trash"></i> Clear Logs
+            </button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-container">
+            <table id="obsTable">
+              <thead>
+                <!-- Populated dynamically -->
+              </thead>
+              <tbody id="obsTableBody">
+                <!-- Logged rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: RESULT -->
+    <div class="tab-content" id="tabContent_result">
+      <div class="text-layout">
+        <h2>Result</h2>
+        <p>The <strong>Superposition Theorem</strong> has been successfully verified experimentally for a linear, bilateral DC network.</p>
+        <p>It was observed that the load current in the middle load resistor branch when both voltage sources are active simultaneously is equivalent to the sum of the load currents when each source acts alone:</p>
+        <div style="background-color: rgba(4,6,13,0.5); padding: 1.25rem; border-radius: 6px; border: 1px solid var(--border-color); font-family: 'Fira Code', monospace; font-size: 1rem; text-align: center; color: var(--color-both); font-weight: bold; margin: 1.5rem 0;">
+          I3 = I1 + I2
+        </div>
+        <p>The experimental values logged inside the observation table match the theoretical calculations solved using Nodal Analysis and Mesh Loop equations within less than <strong>0.01% error</strong>, validating the linearity and bilateral nature of the network components.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ERROR TOAST BANNER -->
+  <div id="errorToast" class="toast-msg">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span id="errorToastText">Short-circuit detected! Protection circuit active.</span>
+  </div>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // ==========================================================================
+    // SIMULATOR STATE
+    // ==========================================================================
+    let simState = {
+      powerOn: false,
+      V_FIXED_VAL: 15.0,
+      V_VAR_VAL: 10.0,
+      activeColor: '#ff3b30', // default: red wire
+      activeWires: [], // array of { start: 'termId', end: 'termId', color: '#ff' }
+      activeMode: 'both', // both, v1_only, v2_only
+      theoryMode: false
+    };
+
+    // Terminal ID to Node Index mappings
+    const termNodeMapping = {
+      'term_vfixed1': 1,
+      'term_vfixed2': 1,
+      'term_vvar1': 2,
+      'term_vvar2': 2,
+      'term_gnd1': 0,
+      'term_gnd2': 0,
+      'term_vpos': 10, 'term_vneg': 11,
+      'term_ipos': 12, 'term_ineg': 13,
+      
+      // Superposition nodes
+      'term_sup_a': 3, 'term_sup_b': 4,
+      'term_sup_c': 5, 'term_sup_d': 6,
+      'term_sup_e': 7,
+      'term_sup_ama': 8, 'term_sup_amf': 9
+    };
+
+    // SVG coordinates for binding post centers (to snap wires)
+    const termCoords = {
+      'term_vfixed1': { x: 140, y: 210 },
+      'term_vfixed2': { x: 180, y: 210 },
+      'term_vvar1': { x: 140, y: 270 },
+      'term_vvar2': { x: 180, y: 270 },
+      'term_gnd1': { x: 140, y: 330 },
+      'term_gnd2': { x: 180, y: 330 },
+      'term_vpos': { x: 485, y: 82 }, 'term_vneg': { x: 485, y: 118 },
+      'term_ipos': { x: 745, y: 82 }, 'term_ineg': { x: 745, y: 118 },
+      
+      // Superposition terminals
+      'term_sup_a': { x: 425, y: 230 }, 'term_sup_b': { x: 425, y: 410 },
+      'term_sup_e': { x: 540, y: 230 },
+      'term_sup_c': { x: 655, y: 230 }, 'term_sup_d': { x: 655, y: 410 },
+      'term_sup_ama': { x: 540, y: 290 }, 'term_sup_amf': { x: 540, y: 350 }
+    };
+
+    // Wire connection UI state
+    let wireStartTerm = null;
+    let isDraggingKnob = false;
+
+    // Observations records
+    let obsSuper = [];
+    
+    // Schematic Tab View State
+    let schematicViewMode = 'both';
+
+    // ==========================================================================
+    // WINDOW ONLOAD / INIT
+    // ==========================================================================
+    window.onload = function() {
+      // Setup rotary knob event listeners
+      setupKnobControl();
+      
+      // Select defaults
+      buildTableHeader();
+      updateSimulation();
+      
+      // Initialize Dial rotation
+      setDialPositionFromVoltage();
+    };
+
+    // Helper to check if two terminals are connected directly
+    function isWired(t1, t2) {
+      return simState.activeWires.some(w => 
+        (w.start === t1 && w.end === t2) || (w.start === t2 && w.end === t1)
+      );
+    }
+
+    // Helper to determine the active mode dynamically based on wiring status
+    function getCurrentMode() {
+      const is1_done = isWired('term_vvar1', 'term_sup_a') && (isWired('term_gnd1', 'term_sup_b') || isWired('term_gnd2', 'term_sup_b'));
+      const is2_done = isWired('term_sup_ama', 'term_ipos') && isWired('term_sup_amf', 'term_ineg');
+      const isBothActive = isWired('term_vfixed1', 'term_sup_c') && (isWired('term_gnd1', 'term_sup_d') || isWired('term_gnd2', 'term_sup_d'));
+      const isV1Only = isWired('term_sup_c', 'term_sup_d');
+      const isV2Only = isWired('term_sup_a', 'term_sup_b') && isWired('term_vfixed1', 'term_sup_c') && (isWired('term_gnd1', 'term_sup_d') || isWired('term_gnd2', 'term_sup_d'));
+      
+      const isCircuitWired = is1_done && is2_done && (isBothActive || isV1Only || isV2Only);
+      if (!isCircuitWired) return 'incomplete';
+      if (isV1Only) return 'v1_only';
+      if (isV2Only) return 'v2_only';
+      if (isBothActive) return 'both';
+      return 'incomplete';
+    }
+
+    // Helper to toggle active/shorted states of the circuit diagram inside the Circuit Diagram tab
+    function setSchematicViewMode(mode) {
+      schematicViewMode = mode;
+      
+      const btnBoth = document.getElementById('btnSchemBoth');
+      const btnV1 = document.getElementById('btnSchemV1');
+      const btnV2 = document.getElementById('btnSchemV2');
+      
+      if (btnBoth && btnV1 && btnV2) {
+        btnBoth.style.borderColor = (mode === 'both') ? 'var(--color-both)' : 'var(--border-color)';
+        btnBoth.style.color = (mode === 'both') ? 'var(--color-both)' : 'var(--text-muted)';
+        btnBoth.style.background = (mode === 'both') ? 'rgba(0,240,255,0.05)' : 'transparent';
+        
+        btnV1.style.borderColor = (mode === 'v1_only') ? 'var(--color-v1)' : 'var(--border-color)';
+        btnV1.style.color = (mode === 'v1_only') ? 'var(--color-v1)' : 'var(--text-muted)';
+        btnV1.style.background = (mode === 'v1_only') ? 'rgba(0,240,255,0.05)' : 'transparent';
+        
+        btnV2.style.borderColor = (mode === 'v2_only') ? 'var(--color-v2)' : 'var(--border-color)';
+        btnV2.style.color = (mode === 'v2_only') ? 'var(--color-v2)' : 'var(--text-muted)';
+        btnV2.style.background = (mode === 'v2_only') ? 'rgba(0,240,255,0.05)' : 'transparent';
+      }
+      
+      const v1Active = document.getElementById('liveSchemV1Active');
+      const v1Shorted = document.getElementById('liveSchemV1Shorted');
+      const v2Active = document.getElementById('liveSchemV2Active');
+      const v2Shorted = document.getElementById('liveSchemV2Shorted');
+      
+      if (v1Active && v1Shorted && v2Active && v2Shorted) {
+        if (mode === 'v1_only') {
+          v1Active.style.display = 'block';
+          v1Shorted.style.display = 'none';
+          v2Active.style.display = 'none';
+          v2Shorted.style.display = 'block';
+        } else if (mode === 'v2_only') {
+          v1Active.style.display = 'none';
+          v1Shorted.style.display = 'block';
+          v2Active.style.display = 'block';
+          v2Shorted.style.display = 'none';
+        } else { // both
+          v1Active.style.display = 'block';
+          v1Shorted.style.display = 'none';
+          v2Active.style.display = 'block';
+          v2Shorted.style.display = 'none';
+        }
+      }
+      
+      updateSimulation();
+    }
+
+    // Auto-Wire presets matching the steps
+    function applyPreset(mode) {
+      if (!simState.powerOn) {
+        toggleMainPower();
+      }
+      
+      simState.activeWires = [];
+      simState.activeMode = mode;
+
+      // Sync the schematic view mode
+      setSchematicViewMode(mode);
+
+      // Base wires (Step 1 and Step 2 are always required):
+      // V1 Source connected to A & B
+      simState.activeWires.push(
+        { start: 'term_vvar1', end: 'term_sup_a', color: '#ff3b30' },
+        { start: 'term_gnd1', end: 'term_sup_b', color: '#00f0ff' }
+      );
+      // Ammeter connected in series
+      simState.activeWires.push(
+        { start: 'term_sup_ama', end: 'term_ipos', color: '#ff3b30' },
+        { start: 'term_ineg', end: 'term_sup_amf', color: '#00f0ff' }
+      );
+      // Voltmeter connected from Node E to Node B by default (for Step 1 & 2)
+      simState.activeWires.push(
+        { start: 'term_sup_e', end: 'term_vpos', color: '#ff3b30' },
+        { start: 'term_sup_b', end: 'term_vneg', color: '#00f0ff' }
+      );
+      
+      if (mode === 'both') {
+        // Both sources active: Connect V2 to C & D, and adjust Voltmeter neg to D (GND rail)
+        simState.activeWires.push(
+          { start: 'term_vfixed1', end: 'term_sup_c', color: '#ff3b30' },
+          { start: 'term_gnd2', end: 'term_sup_d', color: '#00f0ff' }
+        );
+        // Swap voltmeter negative to D (GND rail) to match the connection
+        const vnegWire = simState.activeWires.find(w => w.end === 'term_vneg');
+        if (vnegWire) {
+          vnegWire.start = 'term_sup_d';
+        }
+      } else if (mode === 'v1_only') {
+        // V1 only active: Short C to D
+        simState.activeWires.push(
+          { start: 'term_sup_c', end: 'term_sup_d', color: '#ffcc00' }
+        );
+      } else if (mode === 'v2_only') {
+        // V2 only active: Short A to B, apply Fixed 15V to C, GND to D. Keep V1 connected.
+        simState.activeWires = [
+          // Short A to B
+          { start: 'term_sup_a', end: 'term_sup_b', color: '#ffcc00' },
+          // V1 source connected (keeps source lines connected)
+          { start: 'term_vvar1', end: 'term_sup_a', color: '#ff3b30' },
+          { start: 'term_gnd1', end: 'term_sup_b', color: '#00f0ff' },
+          // Ammeter
+          { start: 'term_sup_ama', end: 'term_ipos', color: '#ff3b30' },
+          { start: 'term_ineg', end: 'term_sup_amf', color: '#00f0ff' },
+          // Voltmeter (measured at E relative to GND Node D)
+          { start: 'term_sup_e', end: 'term_vpos', color: '#ff3b30' },
+          { start: 'term_sup_d', end: 'term_vneg', color: '#00f0ff' },
+          // Connect V2
+          { start: 'term_vfixed1', end: 'term_sup_c', color: '#ff3b30' },
+          { start: 'term_gnd2', end: 'term_sup_d', color: '#00f0ff' }
+        ];
+      }
+      
+      updateSimulation();
+    }
+
+    // THEOREM FORMULAS (DYNAMIC MATHEMATICAL DERIVATION)
+    // ==========================================================================
+    function renderLiveFormulas() {
+      const box = document.getElementById('formulaBox');
+      if (!box) return;
+      const v1 = simState.V_VAR_VAL;
+      const v2 = simState.V_FIXED_VAL; // 15.0
+      
+      const R1 = 82;
+      const R2 = 100;
+      const R3 = 47;
+      const R4 = 56;
+      
+      // Step 1: V1 Acting Alone (V2 Shorted)
+      const R34 = R3 + R4; // 103
+      const R_parallel = (R2 * R34) / (R2 + R34); // (100 * 103) / 203 = 50.7389
+      const R_total = R1 + R_parallel; // 82 + 50.7389 = 132.7389
+      const I_V1 = v1 / R_total;
+      const V_E = I_V1 * R_parallel;
+      const I1 = V_E / R34;
+      const I1_mA = I1 * 1000;
+      
+      // Step 2: V2 Acting Alone (V1 Shorted)
+      const R_parallel2 = (R1 * R34) / (R1 + R34); // (82 * 103) / 185 = 45.654
+      const R_total2 = R2 + R_parallel2; // 100 + 45.654 = 145.654
+      const I_V2 = v2 / R_total2;
+      const V_E2 = I_V2 * R_parallel2;
+      const I2 = V_E2 / R34;
+      const I2_mA = I2 * 1000;
+      
+      // Step 3: Superposition Result
+      const I3 = I1 + I2;
+      const I3_mA = I3 * 1000;
+      
+      // KVL Verification
+      const a11 = R1 + R3 + R4; // 185
+      const a12 = -R34; // -103
+      const a21 = -R34; // -103
+      const a22 = R2 + R3 + R4; // 203
+      const b1 = v1;
+      const b2 = -v2;
+      
+      const Det = a11 * a22 - a12 * a21;
+      const Ia = (b1 * a22 - b2 * a12) / Det;
+      const Ib = (a11 * b2 - a21 * b1) / Det;
+      const I3_direct = Ia - Ib;
+      const I3_direct_mA = I3_direct * 1000;
+      
+      const err = I3_direct_mA !== 0 ? (Math.abs(I3_mA - I3_direct_mA) / Math.abs(I3_direct_mA) * 100) : 0;
+      const verified = err < 0.01;
+      
+      let html = '';
+      
+      // Step 1 Section
+      html += `
+      <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 style="font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: bold; color: var(--color-v1); margin-bottom: 0.4rem;">Step 1 — V1 Only</h3>
+        <div style="line-height: 1.5; font-size: 0.75rem; font-family: 'Fira Code', monospace;">
+          <div>R_parallel = (R2 × (R3 + R4)) / (R2 + R3 + R4)</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= (${R2} × (${R3} + ${R4})) / (${R2} + ${R3} + ${R4}) = <strong>${R_parallel.toFixed(2)} Ω</strong></div>
+          
+          <div>R_total = R1 + R_parallel</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= ${R1} + ${R_parallel.toFixed(2)} = <strong>${R_total.toFixed(2)} Ω</strong></div>
+          
+          <div>I_V1 = V1 / R_total</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= ${v1.toFixed(2)} / ${R_total.toFixed(2)} = <strong>${(I_V1 * 1000).toFixed(2)} mA</strong></div>
+          
+          <div>V_E = I_V1 × R_parallel</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= ${(I_V1 * 1000).toFixed(2)} mA × ${R_parallel.toFixed(2)} Ω = <strong>${V_E.toFixed(2)} V</strong></div>
+          
+          <div>I1 = V_E / (R3 + R4)</div>
+          <div style="color: var(--color-v1);">&nbsp;&nbsp;= ${V_E.toFixed(2)} / (${R3} + ${R4}) = <strong>${I1_mA.toFixed(2)} mA</strong></div>
+        </div>
+      </div>`;
+      
+      // Step 2 Section
+      html += `
+      <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 style="font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: bold; color: var(--color-v2); margin-bottom: 0.4rem;">Step 2 — V2 Only</h3>
+        <div style="line-height: 1.5; font-size: 0.75rem; font-family: 'Fira Code', monospace;">
+          <div>R_parallel2 = (R1 × (R3 + R4)) / (R1 + R3 + R4)</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= (${R1} × (${R3} + ${R4})) / (${R1} + ${R3} + ${R4}) = <strong>${R_parallel2.toFixed(2)} Ω</strong></div>
+          
+          <div>R_total2 = R2 + R_parallel2</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= ${R2} + ${R_parallel2.toFixed(2)} = <strong>${R_total2.toFixed(2)} Ω</strong></div>
+          
+          <div>I_V2 = V2 / R_total2</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= ${v2.toFixed(2)} / ${R_total2.toFixed(2)} = <strong>${(I_V2 * 1000).toFixed(2)} mA</strong></div>
+          
+          <div>V_E2 = I_V2 × R_parallel2</div>
+          <div style="color: var(--text-muted); margin-bottom: 0.25rem;">&nbsp;&nbsp;= ${(I_V2 * 1000).toFixed(2)} mA × ${R_parallel2.toFixed(2)} Ω = <strong>${V_E2.toFixed(2)} V</strong></div>
+          
+          <div>I2 = V_E2 / (R3 + R4)</div>
+          <div style="color: var(--color-v2);">&nbsp;&nbsp;= ${V_E2.toFixed(2)} / (${R3} + ${R4}) = <strong>${I2_mA.toFixed(2)} mA</strong></div>
+        </div>
+      </div>`;
+      
+      // Step 3 Section
+      html += `
+      <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+        <h3 style="font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: bold; color: var(--color-both); margin-bottom: 0.4rem;">Step 3 — Superposition</h3>
+        <div style="line-height: 1.5; font-size: 0.75rem; font-family: 'Fira Code', monospace;">
+          <div>I3 = I1 + I2</div>
+          <div style="color: var(--color-both); font-weight: bold;">&nbsp;&nbsp;= ${I1_mA.toFixed(2)} mA + ${I2_mA.toFixed(2)} mA = <strong>${I3_mA.toFixed(2)} mA</strong></div>
+        </div>
+      </div>`;
+      
+      // Verification Section
+      const badgeStyle = verified ? "background-color: rgba(0, 255, 102, 0.15); border: 1px solid #00ff66; color: #00ff66;" : "background-color: rgba(255, 59, 48, 0.15); border: 1px solid #ff3b30; color: #ff3b30;";
+      const badgeText = verified ? "✔ Verified" : "✘ Mismatch";
+      
+      html += `
+      <div style="margin-bottom: 0.5rem; padding-bottom: 0.2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <h3 style="font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: bold; color: #e2e8f0; margin-bottom: 0;">Verification</h3>
+          <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-family: 'Orbitron', sans-serif; font-weight: bold; ${badgeStyle}">${badgeText}</span>
+   
+        <div style="line-height: 1.5; font-size: 0.73rem; font-family: 'Fira Code', monospace;">
+          <div>Mesh 1: V1 = Ia×(R1 + R3 + R4) − Ib×(R3 + R4)</div>
+          <div style="color: var(--text-muted);">&nbsp;&nbsp;⇒ ${v1.toFixed(2)} = Ia×${a11} − Ib×${Math.abs(a12)}</div>
+          
+          <div>Mesh 2: −V2 = −Ia×(R3 + R4) + Ib×(R2 + R3 + R4)</div>
+          <div style="color: var(--text-muted);">&nbsp;&nbsp;⇒ -${v2.toFixed(2)} = −Ia×${Math.abs(a21)} + Ib×${a22}</div>
+          
+          <div style="margin-top: 0.25rem;">Solved loop currents:</div>
+          <div>&nbsp;&nbsp;Ia = <strong>${(Ia * 1000).toFixed(2)} mA</strong></div>
+          <div>&nbsp;&nbsp;Ib = <strong>${(Ib * 1000).toFixed(2)} mA</strong></div>
+          
+          <div style="margin-top: 0.25rem;">I3_direct = Ia − Ib = <strong>${I3_direct_mA.toFixed(2)} mA</strong></div>
+          <div>Error % = <strong>${err.toFixed(4)}%</strong></div>
+        </div>
+      </div>`;
+      
+      box.innerHTML = html;
+    }
+
+    // Tab Switcher Mechanism
+    function switchTab(tabId) {
+      // Deactivate all tabs
+      document.querySelectorAll('.tab-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+
+      // Activate selected tab
+      const selectedTabBtn = document.getElementById('tabBtn_' + tabId);
+      if (selectedTabBtn) {
+        selectedTabBtn.classList.add('active');
+      }
+      
+      const selectedContent = document.getElementById('tabContent_' + tabId);
+      if (selectedContent) {
+        selectedContent.style.display = 'block';
+      }
+      
+      // If observations tab, render latest data
+      if (tabId === 'observations') {
+        renderObservations();
+      }
+    }
+
+    // Toggle Theory mode in left panel
+    function toggleTheoryMode() {
+      simState.theoryMode = !simState.theoryMode;
+      const schematicContainer = document.getElementById('theorySchematicContainer');
+      const bezelContainer = document.getElementById('trainerBezel');
+      const toggleBtn = document.getElementById('btnTheoryToggle');
+      const leftTitle = document.getElementById('leftPanelTitle');
+
+      if (simState.theoryMode) {
+        schematicContainer.style.display = 'block';
+        bezelContainer.style.display = 'none';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-shuffle"></i> Toggle Kit Mode';
+        leftTitle.innerHTML = '<i class="fa-solid fa-wave-square" style="color: var(--color-purple); margin-right: 6px;"></i> Circuit Schematic';
+      } else {
+        schematicContainer.style.display = 'none';
+        bezelContainer.style.display = 'block';
+        toggleBtn.innerHTML = '<i class="fa-solid fa-shuffle"></i> Toggle Theory Mode';
+        leftTitle.innerHTML = '<i class="fa-solid fa-microchip" style="color: var(--color-v1); margin-right: 6px;"></i> Physical Kit representation';
+      }
+    }
+
+    // Power Toggle Switch
+    function toggleMainPower() {
+      simState.powerOn = !simState.powerOn;
+      const lever = document.getElementById('switchLever');
+      const led = document.getElementById('ledPower');
+      const ledGlow = document.getElementById('ledPowerGlow');
+      const txtV = document.getElementById('txtVolts');
+      const txtA = document.getElementById('txtAmps');
+      const bgV = document.getElementById('bgVolts');
+      const bgA = document.getElementById('bgAmps');
+
+      if (simState.powerOn) {
+        lever.setAttribute('transform', 'rotate(180, 0, 0)'); // Point UP (ON)
+        led.setAttribute('fill', '#ff3b30');
+        ledGlow.setAttribute('opacity', '0.85');
+        txtV.classList.remove('led-inactive');
+        txtA.classList.remove('led-inactive');
+        txtV.style.display = 'block';
+        bgV.style.display = 'block';
+        txtA.style.display = 'block';
+        bgA.style.display = 'block';
+      } else {
+        lever.setAttribute('transform', 'rotate(0, 0, 0)'); // Point DOWN (OFF)
+        led.setAttribute('fill', '#500');
+        ledGlow.setAttribute('opacity', '0.1');
+        txtV.classList.add('led-inactive');
+        txtA.classList.add('led-inactive');
+        txtV.style.display = 'none';
+        bgV.style.display = 'none';
+        txtA.style.display = 'none';
+        bgA.style.display = 'none';
+      }
+      updateSimulation();
+    }
+
+    // ==========================================================================
+    // ROTARY VOLTAGE DIAL INTERACTION (0 to 15V)
+    // ==========================================================================
+    function setupKnobControl() {
+      const knob = document.getElementById('voltageDial');
+      const svg = document.getElementById('faceplateSvg');
+
+      const onMove = (e) => {
+        if (!isDraggingKnob) return;
+        e.preventDefault();
+        
+        const rectSVG = svg.getBoundingClientRect();
+        
+        // Project static (125, 400) coordinates of SVG to client screen
+        const centerX = rectSVG.left + (125 / 1000) * rectSVG.width;
+        const centerY = rectSVG.top + (400 / 500) * rectSVG.height;
+        
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        
+        const dx = clientX - centerX;
+        const dy = clientY - centerY;
+        
+        let angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+        if (angle > 180) angle -= 360;
+        if (angle < -180) angle += 360;
+        
+        // Clamp to potentiometer range [-135, 135]
+        if (angle < -135) angle = -135;
+        if (angle > 135) angle = 135;
+        
+        // Calculate voltage
+        const voltage = ((angle + 135) / 270) * 15.0;
+        simState.V_VAR_VAL = parseFloat(voltage.toFixed(1));
+        
+        // Bidirectional sync: Update slider
+        document.getElementById('sliderVolt').value = simState.V_VAR_VAL;
+        document.getElementById('lblSliderVolt').textContent = simState.V_VAR_VAL.toFixed(1) + " V";
+        
+        // Update label
+        document.getElementById('lblVoltValue').textContent = simState.V_VAR_VAL.toFixed(1) + " V";
+        
+        // Rotate dial graphic
+        knob.setAttribute('transform', `rotate(${angle}, 125, 400)`);
+        updateSimulation();
+      };
+
+      const onEnd = () => {
+        isDraggingKnob = false;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+      };
+
+      knob.addEventListener('mousedown', (e) => {
+        isDraggingKnob = true;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+      });
+
+      knob.addEventListener('touchstart', (e) => {
+        isDraggingKnob = true;
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+      });
+
+      // Handle Mouse Scroll/Wheel over knob
+      document.getElementById('pcbContainer').addEventListener('wheel', (e) => {
+        const knobBounding = knob.getBoundingClientRect();
+        const clientX = e.clientX;
+        const clientY = e.clientY;
+        
+        if (clientX >= knobBounding.left && clientX <= knobBounding.right &&
+            clientY >= knobBounding.top && clientY <= knobBounding.bottom) {
+          e.preventDefault();
+          let deltaV = e.deltaY < 0 ? 0.1 : -0.1;
+          simState.V_VAR_VAL = Math.max(0, Math.min(15, simState.V_VAR_VAL + deltaV));
+          simState.V_VAR_VAL = parseFloat(simState.V_VAR_VAL.toFixed(1));
+          
+          setDialPositionFromVoltage();
+          updateSimulation();
+        }
+      });
+    }
+
+    // Bidirectional sync: Handle slider move
+    function handleSliderVoltChange(val) {
+      simState.V_VAR_VAL = parseFloat(parseFloat(val).toFixed(1));
+      document.getElementById('lblSliderVolt').textContent = simState.V_VAR_VAL.toFixed(1) + " V";
+      setDialPositionFromVoltage();
+      updateSimulation();
+    }
+
+    // Set dial angle from current state voltage
+    function setDialPositionFromVoltage() {
+      const angle = (simState.V_VAR_VAL / 15.0) * 270 - 135;
+      document.getElementById('voltageDial').setAttribute('transform', `rotate(${angle}, 125, 400)`);
+      document.getElementById('lblVoltValue').textContent = simState.V_VAR_VAL.toFixed(1) + " V";
+      document.getElementById('sliderVolt').value = simState.V_VAR_VAL;
+    }
+
+    // Adjust voltage via +/- buttons
+    function adjustVoltageStep(delta) {
+      simState.V_VAR_VAL = Math.max(0, Math.min(15, simState.V_VAR_VAL + delta));
+      simState.V_VAR_VAL = parseFloat(simState.V_VAR_VAL.toFixed(1));
+      setDialPositionFromVoltage();
+      updateSimulation();
+    }
+
+    // Manual input typing handler
+    function handleManualVoltEntry(val) {
+      let f = parseFloat(val);
+      if (isNaN(f)) return;
+      if (f < 0) f = 0;
+      if (f > 15) f = 15;
+      simState.V_VAR_VAL = parseFloat(f.toFixed(1));
+      setDialPositionFromVoltage();
+      updateSimulation();
+    }
+
+    // ==========================================================================
+    // PATCH CORD WIRE SYSTEM (CLICK CONNECTIONS)
+    // ==========================================================================
+    function selectWireColor(element, color) {
+      document.querySelectorAll('.wire-color-option').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      simState.activeColor = color;
+    }
+
+    function handleTermClick(termId, x, y, nodeId) {
+      if (!wireStartTerm) {
+        wireStartTerm = termId;
+        document.getElementById(termId).classList.add('selected');
+        
+        const dragWire = document.getElementById('dragWire');
+        const dragColor = simState.activeColor === '#00f0ff' ? '#1c1c1e' : simState.activeColor;
+        dragWire.setAttribute('stroke', dragColor);
+        dragWire.setAttribute('opacity', '0.7');
+        
+        const updateDragPosition = (clientX, clientY) => {
+          const pcbRect = document.getElementById('pcbContainer').getBoundingClientRect();
+          const scaleX = 1000 / pcbRect.width;
+          const scaleY = 500 / pcbRect.height;
+          
+          const mouseX = (clientX - pcbRect.left) * scaleX;
+          const mouseY = (clientY - pcbRect.top) * scaleY;
+          
+          const midX = (x + mouseX) / 2;
+          const sag = Math.max(50, Math.abs(x - mouseX) * 0.25);
+          const midY = Math.max(y, mouseY) + sag;
+          
+          dragWire.setAttribute('d', `M ${x} ${y} Q ${midX} ${midY} ${mouseX} ${mouseY}`);
+        };
+
+        document.getElementById('faceplateSvg').onmousemove = (event) => {
+          updateDragPosition(event.clientX, event.clientY);
+        };
+
+        document.getElementById('faceplateSvg').ontouchmove = (event) => {
+          if (event.touches && event.touches.length > 0) {
+            updateDragPosition(event.touches[0].clientX, event.touches[0].clientY);
+          }
+        };
+      } else {
+        const start = wireStartTerm;
+        const end = termId;
+        
+        document.getElementById(start).classList.remove('selected');
+        document.getElementById('dragWire').setAttribute('opacity', '0');
+        document.getElementById('faceplateSvg').onmousemove = null;
+        document.getElementById('faceplateSvg').ontouchmove = null;
+        wireStartTerm = null;
+
+        if (start === end) return; 
+
+        // Check duplicate
+        const exists = simState.activeWires.some(w => 
+          (w.start === start && w.end === end) || (w.start === end && w.end === start)
+        );
+        if (exists) return;
+
+        simState.activeWires.push({ start, end, color: simState.activeColor });
+        updateSimulation();
+      }
+    }
+
+    // Cancel drawing
+    document.getElementById('pcbContainer').onclick = function(e) {
+      if (e.target.tagName !== 'use') {
+        if (wireStartTerm) {
+          document.getElementById(wireStartTerm).classList.remove('selected');
+          document.getElementById('dragWire').setAttribute('opacity', '0');
+          document.getElementById('faceplateSvg').onmousemove = null;
+          document.getElementById('faceplateSvg').ontouchmove = null;
+          wireStartTerm = null;
+        }
+      }
+    };
+
+    function clearAllWires() {
+      simState.activeWires = [];
+      updateSimulation();
+    }
+
+    function removeWire(idx) {
+      simState.activeWires.splice(idx, 1);
+      updateSimulation();
+    }
+
+    function redrawWires() {
+      const group = document.getElementById('wiresGroup');
+      group.innerHTML = '';
+      
+      simState.activeWires.forEach((wire, index) => {
+        const startCoords = termCoords[wire.start];
+        const endCoords = termCoords[wire.end];
+        if (!startCoords || !endCoords) return;
+
+        let d;
+        if (Math.abs(startCoords.x - endCoords.x) < 5) {
+          // Straight line for vertical connections (e.g. A to B, C to D)
+          d = `M ${startCoords.x} ${startCoords.y} L ${endCoords.x} ${endCoords.y}`;
+        } else {
+          const midX = (startCoords.x + endCoords.x) / 2;
+          const sag = Math.max(45, Math.abs(startCoords.x - endCoords.x) * 0.22);
+          const midY = Math.max(startCoords.y, endCoords.y) + sag;
+          d = `M ${startCoords.x} ${startCoords.y} Q ${midX} ${midY} ${endCoords.x} ${endCoords.y}`;
+        }
+        
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute('class', 'patch-cord');
+        path.setAttribute('d', d);
+        
+        // Render Cyan wires as neutral black
+        const renderColor = wire.color === '#00f0ff' ? '#1c1c1e' : wire.color;
+        path.setAttribute('stroke', renderColor);
+        path.setAttribute('stroke-width', '5');
+        
+        // Special styling for yellow short jumper (dashed + glow shadow)
+        if (wire.color === '#ffcc00') {
+          path.setAttribute('stroke-dasharray', '6, 4');
+          path.setAttribute('style', 'filter: drop-shadow(0 0 3px rgba(255, 204, 0, 0.85));');
+        }
+        
+        path.setAttribute('ondblclick', `removeWire(${index})`);
+        
+        // Mobile Double-Tap Support
+        let lastTap = 0;
+        path.addEventListener('touchstart', (e) => {
+          const now = Date.now();
+          if (now - lastTap < 300) {
+            e.preventDefault();
+            removeWire(index);
+          }
+          lastTap = now;
+        }, { passive: false });
+        
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = "Double-click or double-tap to remove wire";
+        path.appendChild(title);
+
+        group.appendChild(path);
+      });
+    }
+
+    // ==========================================================================
+    // SPICE-LIKE MATHEMATICAL PHYSICS ENGINE (MODIFIED NODAL ANALYSIS)
+    // ==========================================================================
+    function solveMatrix(A, B) {
+      const n = B.length;
+      for (let i = 0; i < n; i++) {
+        let maxEl = Math.abs(A[i][i]);
+        let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+          if (Math.abs(A[k][i]) > maxEl) {
+            maxEl = Math.abs(A[k][i]);
+            maxRow = k;
+          }
+        }
+        for (let k = i; k < n; k++) {
+          const tmp = A[maxRow][k];
+          A[maxRow][k] = A[i][k];
+          A[i][k] = tmp;
+        }
+        const tmp = B[maxRow];
+        B[maxRow] = B[i];
+        B[i] = tmp;
+
+        if (Math.abs(A[i][i]) < 1e-12) {
+          return new Array(n).fill(0);
+        }
+
+        for (let k = i + 1; k < n; k++) {
+          const c = -A[k][i] / A[i][i];
+          for (let j = i; j < n; j++) {
+            if (i === j) A[k][j] = 0;
+            else A[k][j] += c * A[i][j];
+          }
+          B[k] += c * B[i];
+        }
+      }
+
+      const x = new Array(n).fill(0);
+      for (let i = n - 1; i >= 0; i--) {
+        x[i] = B[i] / A[i][i];
+        for (let k = i - 1; k >= 0; k--) {
+          B[k] -= A[k][i] * x[i];
+        }
+      }
+      return x;
+    }
+
+    function runMNASolver() {
+      const nodeCount = 14;
+      
+      const A = Array.from({ length: nodeCount }, () => new Array(nodeCount).fill(0));
+      const B = new Array(nodeCount).fill(0);
+
+      const GMIN = 1e-9;
+      for (let i = 0; i < nodeCount; i++) {
+        A[i][i] += GMIN;
+      }
+
+      A[0][0] += 1e9; // force V0 = 0 (GND)
+
+      // Fixed 15V supply at Node 1
+      const G_src = 100.0;
+      A[1][1] += G_src;
+      
+      const mode = getCurrentMode();
+      const vFixed = (mode === 'v1_only') ? 0.0 : simState.V_FIXED_VAL;
+      const vVar = (mode === 'v2_only') ? 0.0 : simState.V_VAR_VAL;
+      
+      B[1] += vFixed * G_src;
+
+      // Variable supply (0-15V) at Node 2
+      A[2][2] += G_src;
+      B[2] += vVar * G_src;
+
+      // Voltmeter internal resistance (10 Megohm) between 10 and 11
+      addResistorToMNA(A, 10, 11, 1e7);
+
+      // Ammeter internal resistance (0.1 ohm) between 12 and 13
+      addResistorToMNA(A, 12, 13, 0.1);
+
+      // PCB Traces Resistors
+      addResistorToMNA(A, 3, 7, 82);   // R1 (82E) between A(3) and E(7)
+      addResistorToMNA(A, 7, 5, 100);  // R2 (100E) between E(7) and C(5)
+      addResistorToMNA(A, 9, 4, 47);   // R3 (47E) between AM_F(9) and B(4)
+      addResistorToMNA(A, 4, 6, 56);   // R4 (56E) between B(4) and D(6)
+      
+      // Middle branch ammeter posts trace bridge E(7) to AM_A(8)
+      addResistorToMNA(A, 7, 8, 0.01); 
+
+      // Add User Wires
+      simState.activeWires.forEach(wire => {
+        const n1 = termNodeMapping[wire.start];
+        const n2 = termNodeMapping[wire.end];
+        if (n1 !== undefined && n2 !== undefined) {
+          addResistorToMNA(A, n1, n2, 0.01);
+        }
+      });
+
+      const V = solveMatrix(A, B);
+      
+      // Check short circuit conditions
+      const isPresetV1Short = isWired('term_sup_a', 'term_sup_b');
+      const isPresetV2Short = isWired('term_sup_c', 'term_sup_d');
+      
+      const isShortVvar = V[2] < (simState.V_VAR_VAL * 0.8) && simState.V_VAR_VAL > 1.0 && !isPresetV1Short;
+      const isShortVfixed = V[1] < (simState.V_FIXED_VAL * 0.8) && simState.V_FIXED_VAL > 1.0 && !isPresetV2Short;
+      
+      if (isShortVvar || isShortVfixed) {
+        document.getElementById('errorToast').style.display = 'flex';
+      } else {
+        document.getElementById('errorToast').style.display = 'none';
+      }
+
+      return V;
+    }
+
+    function addResistorToMNA(A, n1, n2, R) {
+      const G = 1.0 / R;
+      A[n1][n1] += G;
+      A[n2][n2] += G;
+      A[n1][n2] -= G;
+      A[n2][n1] -= G;
+    }
+
+    // ==========================================================================
+    // SIMULATION GRAPHICS & DISPLAYS COORDINATION
+    // ==========================================================================
+    function updateSimulation() {
+      redrawWires();
+
+      const V = runMNASolver();
+
+      const dispV = document.getElementById('txtVolts');
+      const dispI = document.getElementById('txtAmps');
+      const bgV = document.getElementById('bgVolts');
+      const bgA = document.getElementById('bgAmps');
+
+      // Reference Layout: Dynamic Middle Panel Viewport
+      const mode = getCurrentMode();
+      const isCircuitWired = (mode !== 'incomplete');
+
+      // Theoretical superposition math values for the physical display meters
+      const v1 = simState.V_VAR_VAL;
+      const v2 = simState.V_FIXED_VAL;
+      const R1 = 82;
+      const R2 = 100;
+      const R3 = 47;
+      const R4 = 56;
+      const R34 = R3 + R4; // 103
+
+      // V1 Acting Alone
+      const Rp1 = (R2 * R34) / (R2 + R34);
+      const VE1 = v1 * (Rp1 / (R1 + Rp1));
+      const I1_mA = (VE1 / R34) * 1000;
+
+      // V2 Acting Alone
+      const Rp2 = (R1 * R34) / (R1 + R34);
+      const VE2 = v2 * (Rp2 / (R2 + Rp2));
+      const I2_mA = (VE2 / R34) * 1000;
+
+      let displayV = 0.0;
+      let displayI = 0.0;
+
+      if (isCircuitWired && simState.powerOn) {
+        if (mode === 'v1_only') {
+          displayV = VE1;
+          displayI = I1_mA;
+        } else if (mode === 'v2_only') {
+          displayV = VE2;
+          displayI = I2_mA;
+        } else if (mode === 'both') {
+          displayV = VE1 + VE2;
+          displayI = I1_mA + I2_mA;
+        }
+      }
+
+      // Compute values for the dynamic schematic in Circuit Diagram tab based on schematicViewMode
+      let schemVE = 0.0;
+      let schemI = 0.0;
+      let schemLabel = 'I3';
+      if (schematicViewMode === 'v1_only') {
+        schemVE = VE1;
+        schemI = I1_mA;
+        schemLabel = 'I1';
+      } else if (schematicViewMode === 'v2_only') {
+        schemVE = VE2;
+        schemI = I2_mA;
+        schemLabel = 'I2';
+      } else { // both
+        schemVE = VE1 + VE2;
+        schemI = I1_mA + I2_mA;
+        schemLabel = 'I3';
+      }
+
+      // Update live schematic labels (updates even if not wired, so user can see theoretical configuration)
+      const elV1Text = document.getElementById('liveSchemV1Text');
+      if (elV1Text) elV1Text.textContent = simState.V_VAR_VAL.toFixed(1) + "V";
+      
+      const elV2Text = document.getElementById('liveSchemV2Text');
+      if (elV2Text) elV2Text.textContent = simState.V_FIXED_VAL.toFixed(1) + "V";
+      
+      const elVEText = document.getElementById('liveSchemVEText');
+      if (elVEText) elVEText.textContent = schemVE.toFixed(2) + "V (E)";
+      
+      const elI3Text = document.getElementById('liveSchemI3Text');
+      if (elI3Text) {
+        elI3Text.textContent = schemLabel + " = " + schemI.toFixed(2) + "mA";
+        let col = (schematicViewMode === 'v1_only') ? 'var(--color-v1)' : ((schematicViewMode === 'v2_only') ? 'var(--color-v2)' : 'var(--color-both)');
+        elI3Text.style.fill = col;
+      }
+
+      if (simState.powerOn && isCircuitWired) {
+        dispV.textContent = displayV.toFixed(2);
+        dispV.classList.remove('led-inactive');
+        dispV.style.display = 'block';
+        bgV.style.display = 'block';
+
+        dispI.textContent = displayI.toFixed(2);
+        dispI.classList.remove('led-inactive');
+        dispI.style.display = 'block';
+        bgA.style.display = 'block';
+        
+        // Update sidebar ammeter reading if element exists
+        const txtAmpsBranchEl = document.getElementById('txtAmpsBranch');
+        if (txtAmpsBranchEl) {
+          txtAmpsBranchEl.textContent = displayI.toFixed(2);
+        }
+      } else {
+        dispV.textContent = "0.00";
+        dispI.textContent = "0.00";
+        
+        dispV.classList.add('led-inactive');
+        dispV.style.display = 'none';
+        bgV.style.display = 'none';
+        
+        dispI.classList.add('led-inactive');
+        dispI.style.display = 'none';
+        bgA.style.display = 'none';
+        
+        const txtAmpsBranchEl = document.getElementById('txtAmpsBranch');
+        if (txtAmpsBranchEl) {
+          txtAmpsBranchEl.textContent = "0.00";
+        }
+      }
+
+      // Update control panel sliders state
+      const sliderGroupV1 = document.getElementById('sliderGroupV1');
+      const sliderGroupV2 = document.getElementById('sliderGroupV2');
+      const sliderVolt = document.getElementById('sliderVolt');
+      const sliderFixed = document.getElementById('sliderFixed');
+      const lblSliderVolt = document.getElementById('lblSliderVolt');
+      const lblSliderFixed = document.getElementById('lblSliderFixed');
+
+      if (sliderGroupV1 && sliderGroupV2 && sliderVolt && sliderFixed && lblSliderVolt && lblSliderFixed) {
+        if (mode === 'v1_only') {
+          // V1 Only: V2 = 0V, disabled, grayed out. V1 active.
+          sliderGroupV2.style.opacity = "0.25";
+          sliderFixed.disabled = true;
+          lblSliderFixed.textContent = "0.0 V (Shorted)";
+
+          sliderGroupV1.style.opacity = "1.0";
+          sliderVolt.disabled = false;
+          lblSliderVolt.textContent = simState.V_VAR_VAL.toFixed(1) + " V";
+        } else if (mode === 'v2_only') {
+          // V2 Only: V1 = 0V, disabled, grayed out. V2 active.
+          sliderGroupV1.style.opacity = "0.25";
+          sliderVolt.disabled = true;
+          lblSliderVolt.textContent = "0.0 V (Shorted)";
+
+          sliderGroupV2.style.opacity = "1.0";
+          sliderFixed.disabled = true;
+          lblSliderFixed.textContent = simState.V_FIXED_VAL.toFixed(1) + " V";
+        } else {
+          // Both Active or incomplete: restore default states
+          sliderGroupV1.style.opacity = "1.0";
+          sliderVolt.disabled = false;
+          lblSliderVolt.textContent = simState.V_VAR_VAL.toFixed(1) + " V";
+
+          // Fixed Voltage is always disabled, but not shorted
+          sliderGroupV2.style.opacity = "0.8"; // Slightly dim since disabled but readable
+          sliderFixed.disabled = true;
+          lblSliderFixed.textContent = simState.V_FIXED_VAL.toFixed(1) + " V";
+        }
+      }
+
+      // Calculations and bottom panel updates
+      updateKeyParameters(V, mode);
+      validateSteps();
+      renderLiveFormulas();
+    }
+
+    // Update bottom parameters dashboard values
+    function updateKeyParameters(V, mode) {
+      const v1 = (mode === 'v2_only') ? 0.0 : simState.V_VAR_VAL;
+      const v2 = (mode === 'v1_only') ? 0.0 : simState.V_FIXED_VAL;
+      
+      const R1 = 82;
+      const R2 = 100;
+      const R3 = 47;
+      const R4 = 56;
+      const R34 = R3 + R4; // 103
+
+      // Open circuit voltage at Node E (R3 disconnected)
+      const voc = (v1 * R2 + v2 * R1) / (R1 + R2);
+      document.getElementById('paramVoc').textContent = voc.toFixed(2) + " V";
+
+      // Short circuit current (Max current Variable supply can push)
+      const isc = (v1 / R1) * 1000;
+      document.getElementById('paramIsc').textContent = isc.toFixed(2) + " mA";
+
+      // Maximum power transfer limit
+      const r_th = (R1 * R2) / (R1 + R2) + R4; // 45.05 + 56 = 101.05
+      const pmax = (Math.pow(voc, 2) / (4 * r_th)) * 1000; // in mW
+      document.getElementById('paramPmax').textContent = pmax.toFixed(2) + " mW";
+
+      // Theoretical superposition components
+      const R_parallel = (R2 * R34) / (R2 + R34);
+      const I1_mA = (v1 / (R1 + R_parallel)) * (R_parallel / R34) * 1000;
+      const VE1 = I1_mA * R34 / 1000;
+
+      const R_parallel2 = (R1 * R34) / (R1 + R34);
+      const I2_mA = (v2 / (R2 + R_parallel2)) * (R_parallel2 / R34) * 1000;
+      const VE2 = I2_mA * R34 / 1000;
+
+      const I3_mA = I1_mA + I2_mA;
+
+      // KVL Mesh Verification Solver
+      const a11 = R1 + R3 + R4;
+      const a12 = -R34;
+      const a21 = -R34;
+      const a22 = R2 + R3 + R4;
+      const Det = a11 * a22 - a12 * a21;
+      const Ia = (v1 * a22 - (-v2) * a12) / Det;
+      const Ib = (a11 * (-v2) - a21 * v1) / Det;
+      const I3_direct_mA = (Ia - Ib) * 1000;
+
+      // Update parameter card elements and opacities
+      const cardI1 = document.getElementById('cardParamI1');
+      const cardI2 = document.getElementById('cardParamI2');
+      const cardI3 = document.getElementById('cardParamI3');
+      const cardI3Direct = document.getElementById('cardParamI3Direct');
+
+      // Reset values to active math
+      document.getElementById('paramI1').textContent = I1_mA.toFixed(2) + " mA";
+      document.getElementById('paramI2').textContent = I2_mA.toFixed(2) + " mA";
+      document.getElementById('paramI3').textContent = I3_mA.toFixed(2) + " mA";
+      document.getElementById('paramI3Direct').textContent = I3_direct_mA.toFixed(2) + " mA";
+
+      if (cardI1) cardI1.style.opacity = "1.0";
+      if (cardI2) cardI2.style.opacity = "1.0";
+      if (cardI3) cardI3.style.opacity = "1.0";
+      if (cardI3Direct) cardI3Direct.style.opacity = "1.0";
+
+      if (mode === 'incomplete') {
+        const badgeStyle = "background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.5);";
+        const badgeText = "Pending";
+        document.getElementById('paramVerify').innerHTML = `
+          <span style="font-size: 0.78rem; padding: 2px 6px; border-radius: 4px; font-family: 'Orbitron', sans-serif; font-weight: bold; ${badgeStyle}">${badgeText}</span>
+        `;
+        document.getElementById('paramOperatingPoint').innerHTML = `
+          <span>Operating Point: V_E = 0.00 V, I_3 = 0.00 mA, P = 0.00 mW, RL = 103.0 Ω</span>
+          <span style="color: var(--text-muted); font-size: 0.8rem;">Wire the kit components to activate solver</span>
+        `;
+        return;
+      }
+
+      let badgeStyle = "";
+      let badgeText = "";
+
+      if (mode === 'v1_only') {
+        if (cardI2) cardI2.style.opacity = "0.35";
+        if (cardI3) cardI3.style.opacity = "0.35";
+        if (cardI3Direct) cardI3Direct.style.opacity = "0.35";
+
+        document.getElementById('paramI2').textContent = "—";
+        document.getElementById('paramI3').textContent = "—";
+        document.getElementById('paramI3Direct').textContent = "—";
+
+        badgeStyle = "background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.5);";
+        badgeText = "Pending";
+      } else if (mode === 'v2_only') {
+        if (cardI1) cardI1.style.opacity = "0.35";
+        if (cardI3) cardI3.style.opacity = "0.35";
+        if (cardI3Direct) cardI3Direct.style.opacity = "0.35";
+
+        document.getElementById('paramI1').textContent = "—";
+        document.getElementById('paramI3').textContent = "—";
+        document.getElementById('paramI3Direct').textContent = "—";
+
+        badgeStyle = "background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.5);";
+        badgeText = "Pending";
+      } else if (mode === 'both') {
+        const err = I3_direct_mA !== 0 ? (Math.abs(I3_mA - I3_direct_mA) / Math.abs(I3_direct_mA) * 100) : 0;
+        const verified = err < 0.01;
+        badgeStyle = verified ? "background-color: rgba(0, 255, 102, 0.15); border: 1px solid #00ff66; color: #00ff66;" : "background-color: rgba(255, 59, 48, 0.15); border: 1px solid #ff3b30; color: #ff3b30;";
+        badgeText = verified ? "✔ Verified" : "✘ Mismatch";
+      } else {
+        badgeStyle = "background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.5);";
+        badgeText = "Pending";
+      }
+
+      document.getElementById('paramVerify').innerHTML = `
+        <span style="font-size: 0.78rem; padding: 2px 6px; border-radius: 4px; font-family: 'Orbitron', sans-serif; font-weight: bold; ${badgeStyle}">${badgeText}</span>
+      `;
+
+      // Live Operating Point row values (based on selected mode)
+      let opCurrentLabel = "I_3";
+      let opCurrentVal = 0.0;
+      let opVoltVal = 0.0;
+      
+      if (mode === 'v1_only') {
+        opCurrentLabel = "I_1";
+        opCurrentVal = I1_mA;
+        opVoltVal = VE1;
+      } else if (mode === 'v2_only') {
+        opCurrentLabel = "I_2";
+        opCurrentVal = I2_mA;
+        opVoltVal = VE2;
+      } else if (mode === 'both') {
+        opCurrentLabel = "I_3";
+        opCurrentVal = I3_mA;
+        opVoltVal = VE1 + VE2;
+      }
+      
+      const opPowerVal = (opCurrentVal / 1000) * (opCurrentVal / 1000) * R34 * 1000; // I^2 * R34 (mW)
+
+      document.getElementById('paramOperatingPoint').innerHTML = `
+        <span>Operating Point: V_E = ${opVoltVal.toFixed(2)} V, ${opCurrentLabel} = ${opCurrentVal.toFixed(2)} mA, P = ${opPowerVal.toFixed(2)} mW, RL = 103.0 Ω</span>
+        <span style="color: var(--color-v1);">Superposition Theorem Solver Engine Active</span>
+      `;
+    }
+
+    // Validate wizard steps based on active wires
+    function validateSteps() {
+      // Helper functions for dual-terminal layout
+      const isNodeWiredToGnd = (nodeTerm) => isWired('term_gnd1', nodeTerm) || isWired('term_gnd2', nodeTerm);
+      const isNodeWiredToVar = (nodeTerm) => isWired('term_vvar1', nodeTerm);
+      const isNodeWiredToFixed = (nodeTerm) => isWired('term_vfixed1', nodeTerm);
+      
+      const is1_done = isNodeWiredToVar('term_sup_a') && isNodeWiredToGnd('term_sup_b');
+      const is2_done = isWired('term_sup_ama', 'term_ipos') && isWired('term_sup_amf', 'term_ineg');
+      
+      // Step 3 check
+      const isBothActive = isNodeWiredToFixed('term_sup_c') && isNodeWiredToGnd('term_sup_d');
+      const isV1Only = isWired('term_sup_c', 'term_sup_d');
+      const isV2Only = isWired('term_sup_a', 'term_sup_b') && isNodeWiredToFixed('term_sup_c') && isNodeWiredToGnd('term_sup_d');
+      const is3_done = isBothActive || isV1Only || isV2Only;
+      
+      // Step 1 styling
+      const card1 = document.getElementById('stepCard1');
+      const icon1 = document.getElementById('stepIcon1');
+      if (card1 && icon1) {
+        if (is1_done) {
+          setStepCardState(card1, icon1, 'done');
+        } else {
+          setStepCardState(card1, icon1, 'active');
+        }
+      }
+      
+      // Step 2 styling
+      const card2 = document.getElementById('stepCard2');
+      const icon2 = document.getElementById('stepIcon2');
+      if (card2 && icon2) {
+        if (is2_done) {
+          setStepCardState(card2, icon2, 'done');
+        } else if (is1_done) {
+          setStepCardState(card2, icon2, 'active');
+        } else {
+          setStepCardState(card2, icon2, 'locked');
+        }
+      }
+      
+      // Step 3 styling
+      const card3 = document.getElementById('stepCard3');
+      const icon3 = document.getElementById('stepIcon3');
+      if (card3 && icon3) {
+        if (is3_done) {
+          setStepCardState(card3, icon3, 'done');
+        } else if (is1_done && is2_done) {
+          setStepCardState(card3, icon3, 'active');
+        } else {
+          setStepCardState(card3, icon3, 'locked');
+        }
+      }
+      
+      // Update header preset buttons highlights
+      const btnAutoBoth = document.getElementById('btnAutoBoth');
+      if (btnAutoBoth) {
+        btnAutoBoth.style.borderColor = isBothActive ? '#00ff66' : 'var(--border-color)';
+      }
+      const btnAutoV1 = document.getElementById('btnAutoV1');
+      if (btnAutoV1) {
+        btnAutoV1.style.borderColor = isV1Only ? '#00f0ff' : 'var(--border-color)';
+      }
+      const btnAutoV2 = document.getElementById('btnAutoV2');
+      if (btnAutoV2) {
+        btnAutoV2.style.borderColor = isV2Only ? '#ff9f1c' : 'var(--border-color)';
+      }
+    }
+    
+    function setStepCardState(card, icon, state) {
+      if (state === 'done') {
+        card.style.borderColor = '#00ff66';
+        card.style.backgroundColor = 'rgba(0, 255, 102, 0.04)';
+        icon.style.color = '#00ff66';
+        icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+      } else if (state === 'active') {
+        card.style.borderColor = '#ff9f1c';
+        card.style.backgroundColor = 'rgba(255, 159, 28, 0.04)';
+        icon.style.color = '#ff9f1c';
+        icon.innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
+      } else {
+        card.style.borderColor = 'var(--border-color)';
+        card.style.backgroundColor = 'transparent';
+        icon.style.color = 'var(--text-muted)';
+        icon.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
+      }
+    }
+
+    // ==========================================================================
+    // OBSERVATION LOGGING TABLE & EXPORT
+    // ==========================================================================
+    function buildTableHeader() {
+      const header = document.querySelector('#obsTable thead');
+      header.innerHTML = `
+        <tr>
+          <th>State</th>
+          <th>V1 (V)</th>
+          <th>V2 (V)</th>
+          <th>I1 (mA)</th>
+          <th>I2 (mA)</th>
+          <th style="color: var(--color-both);">I3 = I1 + I2 (mA)</th>
+          <th>I3_direct (mA)</th>
+          <th>Match?</th>
+        </tr>
+      `;
+    }
+
+    function logObservations() {
+      const mode = getCurrentMode();
+      if (mode === 'incomplete') {
+        alert("Please complete the circuit connections before recording values.");
+        return;
+      }
+
+      const v1 = (mode === 'v2_only') ? 0.0 : simState.V_VAR_VAL;
+      const v2 = (mode === 'v1_only') ? 0.0 : simState.V_FIXED_VAL;
+      
+      const R1 = 82;
+      const R2 = 100;
+      const R3 = 47;
+      const R4 = 56;
+      const R34 = R3 + R4;
+      
+      // Calculate Step 1 & Step 2 using same voltage-divider math as updateSimulation()
+      const R_parallel = (R2 * R34) / (R2 + R34);
+      const I1_mA = ((v1 * (R_parallel / (R1 + R_parallel))) / R34) * 1000;
+      
+      const R_parallel2 = (R1 * R34) / (R1 + R34);
+      const I2_mA = ((v2 * (R_parallel2 / (R2 + R_parallel2))) / R34) * 1000;
+      
+      const I3_mA = I1_mA + I2_mA;
+      
+      // KVL Verification
+      const a11 = R1 + R3 + R4; // 185
+      const a12 = -R34; // -103
+      const a21 = -R34; // -103
+      const a22 = R2 + R3 + R4; // 203
+      const b1 = v1;
+      const b2 = -v2;
+      
+      const Det = a11 * a22 - a12 * a21;
+      const Ia = (b1 * a22 - b2 * a12) / Det;
+      const Ib = (a11 * b2 - a21 * b1) / Det;
+      const I3_direct_mA = (Ia - Ib) * 1000;
+      
+      const isMatch = Math.abs(I3_mA - I3_direct_mA) < 0.05 ? "✔ Yes" : "✘ No";
+      
+      let stateLabel = "";
+      if (mode === 'v1_only') stateLabel = "V1 Only";
+      else if (mode === 'v2_only') stateLabel = "V2 Only";
+      else if (mode === 'both') stateLabel = "Both Active";
+      
+      obsSuper.push({
+        state: stateLabel,
+        v1: v1,
+        v2: v2,
+        i1: I1_mA,
+        i2: I2_mA,
+        i3: I3_mA,
+        direct: I3_direct_mA,
+        match: isMatch
+      });
+      renderObservations();
+    }
+
+    function renderObservations() {
+      const tbody = document.getElementById('obsTableBody');
+      tbody.innerHTML = '';
+
+      if (obsSuper.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No records logged yet. Turn power on, wire the kit, and click Add Row!</td></tr>`;
+        return;
+      }
+
+      obsSuper.forEach((obs, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${obs.state} (#${index + 1})</td>
+          <td>${obs.v1.toFixed(2)}</td>
+          <td>${obs.v2.toFixed(2)}</td>
+          <td>${obs.i1.toFixed(2)}</td>
+          <td>${obs.i2.toFixed(2)}</td>
+          <td style="color: var(--color-both); font-weight: bold;">${obs.i3.toFixed(2)}</td>
+          <td>${obs.direct.toFixed(2)}</td>
+          <td style="color: var(--color-both); font-weight: bold;">${obs.match}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearObservations() {
+      obsSuper = [];
+      renderObservations();
+    }
+
+    function exportCSV() {
+      if (obsSuper.length === 0) {
+        alert("No logs to export.");
+        return;
+      }
+
+      let csvContent = "State,V1 (V),V2 (V),I1 (mA),I2 (mA),I3 = I1+I2 (mA),I3_direct (mA),Match\r\n";
+      obsSuper.forEach((obs, idx) => {
+        csvContent += `"${obs.state} (#${idx + 1})",${obs.v1},${obs.v2},${obs.i1},${obs.i2},${obs.i3},${obs.direct},${obs.match}\r\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `bee_superposition_lab_results.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
+
